@@ -1,0 +1,5 @@
+C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/CMakeFiles/DeckBuilderPro.dir
+C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/CMakeFiles/edit_cache.dir
+C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/CMakeFiles/DeckBuilderPro_autogen_timestamp_deps.dir
+C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/CMakeFiles/DeckBuilderPro_autogen.dir
