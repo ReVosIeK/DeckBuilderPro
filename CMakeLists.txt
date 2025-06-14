@@ -16,13 +16,13 @@ add_executable(DeckBuilderPro
     Card.cpp
     Player.cpp
     CardLoader.cpp
-    GameManager.cpp
+    GameManager.cpp # <<< Poprawiono na wielką literę
 
     Card.h
     Player.h
     CardLoader.h
+    GameManager.h # <<< Poprawiono na wielką literę
     json.hpp
-    GameManager.h
 )
 
 # Linkujemy już tylko z modułem Core!

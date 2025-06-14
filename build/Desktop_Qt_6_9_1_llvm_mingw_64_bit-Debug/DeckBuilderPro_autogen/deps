@@ -1019,6 +1019,8 @@ DeckBuilderPro_autogen/timestamp: \
 	C:/Users/mresp/Desktop/DeckBuilderPro/Card.h \
 	C:/Users/mresp/Desktop/DeckBuilderPro/CardLoader.cpp \
 	C:/Users/mresp/Desktop/DeckBuilderPro/CardLoader.h \
+	C:/Users/mresp/Desktop/DeckBuilderPro/GameManager.cpp \
+	C:/Users/mresp/Desktop/DeckBuilderPro/GameManager.h \
 	C:/Users/mresp/Desktop/DeckBuilderPro/Player.cpp \
 	C:/Users/mresp/Desktop/DeckBuilderPro/Player.h \
 	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/.qtc/package-manager/auto-setup.cmake \
@@ -1026,8 +1028,6 @@ DeckBuilderPro_autogen/timestamp: \
 	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake \
 	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/CMakeFiles/3.30.5/CMakeSystem.cmake \
 	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/moc_predefs.h \
-	C:/Users/mresp/Desktop/DeckBuilderPro/gamemanager.cpp \
-	C:/Users/mresp/Desktop/DeckBuilderPro/gamemanager.h \
 	C:/Users/mresp/Desktop/DeckBuilderPro/json.hpp \
 	C:/Users/mresp/Desktop/DeckBuilderPro/main.cpp \
 	C:/Qt/Tools/CMake_64/bin/cmake.exe

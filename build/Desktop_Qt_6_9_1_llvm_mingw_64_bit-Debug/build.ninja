@@ -89,9 +89,9 @@ build CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj: CXX_COMPILER__DeckBuilde
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
   OBJECT_FILE_DIR = CMakeFiles\DeckBuilderPro.dir
 
-build CMakeFiles/DeckBuilderPro.dir/gamemanager.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/gamemanager.cpp || cmake_object_order_depends_target_DeckBuilderPro
+build CMakeFiles/DeckBuilderPro.dir/GameManager.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/GameManager.cpp || cmake_object_order_depends_target_DeckBuilderPro
   DEFINES = -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64
-  DEP_FILE = CMakeFiles\DeckBuilderPro.dir\gamemanager.cpp.obj.d
+  DEP_FILE = CMakeFiles\DeckBuilderPro.dir\GameManager.cpp.obj.d
   FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -pthread
   INCLUDES = -IC:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/include -isystem C:/Qt/6.9.1/llvm-mingw_64/include/QtCore -isystem C:/Qt/6.9.1/llvm-mingw_64/include -isystem C:/Qt/6.9.1/llvm-mingw_64/mkspecs/win32-clang-g++
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
@@ -105,7 +105,7 @@ build CMakeFiles/DeckBuilderPro.dir/gamemanager.cpp.obj: CXX_COMPILER__DeckBuild
 #############################################
 # Link the executable DeckBuilderPro.exe
 
-build DeckBuilderPro.exe: CXX_EXECUTABLE_LINKER__DeckBuilderPro_Debug CMakeFiles/DeckBuilderPro.dir/DeckBuilderPro_autogen/mocs_compilation.cpp.obj CMakeFiles/DeckBuilderPro.dir/main.cpp.obj CMakeFiles/DeckBuilderPro.dir/Card.cpp.obj CMakeFiles/DeckBuilderPro.dir/Player.cpp.obj CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj CMakeFiles/DeckBuilderPro.dir/gamemanager.cpp.obj | C$:/Qt/6.9.1/llvm-mingw_64/lib/libQt6Core.a || DeckBuilderPro_autogen DeckBuilderPro_autogen_timestamp_deps
+build DeckBuilderPro.exe: CXX_EXECUTABLE_LINKER__DeckBuilderPro_Debug CMakeFiles/DeckBuilderPro.dir/DeckBuilderPro_autogen/mocs_compilation.cpp.obj CMakeFiles/DeckBuilderPro.dir/main.cpp.obj CMakeFiles/DeckBuilderPro.dir/Card.cpp.obj CMakeFiles/DeckBuilderPro.dir/Player.cpp.obj CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj CMakeFiles/DeckBuilderPro.dir/GameManager.cpp.obj | C$:/Qt/6.9.1/llvm-mingw_64/lib/libQt6Core.a || DeckBuilderPro_autogen DeckBuilderPro_autogen_timestamp_deps
   FLAGS = -DQT_QML_DEBUG -g
   LINK_LIBRARIES = C:/Qt/6.9.1/llvm-mingw_64/lib/libQt6Core.a  -pthread  -lmpr  -luserenv  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir

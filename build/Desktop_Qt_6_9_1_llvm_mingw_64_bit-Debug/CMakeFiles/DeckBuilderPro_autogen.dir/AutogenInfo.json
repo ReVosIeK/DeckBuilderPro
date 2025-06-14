@@ -156,15 +156,15 @@
 			null
 		],
 		[
-			"C:/Users/mresp/Desktop/DeckBuilderPro/Player.h",
+			"C:/Users/mresp/Desktop/DeckBuilderPro/GameManager.h",
 			"Mu",
-			"EWIEGA46WW/moc_Player.cpp",
+			"EWIEGA46WW/moc_GameManager.cpp",
 			null
 		],
 		[
-			"C:/Users/mresp/Desktop/DeckBuilderPro/gamemanager.h",
+			"C:/Users/mresp/Desktop/DeckBuilderPro/Player.h",
 			"Mu",
-			"EWIEGA46WW/moc_gamemanager.cpp",
+			"EWIEGA46WW/moc_Player.cpp",
 			null
 		],
 		[
@@ -240,8 +240,8 @@
 	[
 		[ "C:/Users/mresp/Desktop/DeckBuilderPro/Card.cpp", "Mu", null ],
 		[ "C:/Users/mresp/Desktop/DeckBuilderPro/CardLoader.cpp", "Mu", null ],
+		[ "C:/Users/mresp/Desktop/DeckBuilderPro/GameManager.cpp", "Mu", null ],
 		[ "C:/Users/mresp/Desktop/DeckBuilderPro/Player.cpp", "Mu", null ],
-		[ "C:/Users/mresp/Desktop/DeckBuilderPro/gamemanager.cpp", "Mu", null ],
 		[ "C:/Users/mresp/Desktop/DeckBuilderPro/main.cpp", "Mu", null ]
 	],
 	"USE_BETTER_GRAPH" : true,
