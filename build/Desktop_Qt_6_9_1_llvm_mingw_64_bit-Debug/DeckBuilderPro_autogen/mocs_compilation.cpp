@@ -2,3 +2,4 @@
 #include "EWIEGA46WW/moc_Card.cpp"
 #include "EWIEGA46WW/moc_CardLoader.cpp"
 #include "EWIEGA46WW/moc_Player.cpp"
+#include "EWIEGA46WW/moc_gamemanager.cpp"
