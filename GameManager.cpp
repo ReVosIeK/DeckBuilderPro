@@ -1,19 +1,19 @@
 #include "GameManager.h"
+#include "Card.h"
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QFile>
+#include <QRandomGenerator>
 #include <random>
 #include <algorithm>
 #include <chrono>
 
-// === POCZĄTEK POPRAWKI: Przywrócenie brakującego konstruktora ===
 GameManager::GameManager(QObject *parent) : QObject(parent)
 {
-    // Konstruktor, który był przypadkowo usunięty
+    m_currentPlayer = nullptr; // Inicjalizacja wskaźnika
 }
-// === KONIEC POPRAWKI ===
 
 void GameManager::setupNewGame(int playerCount, int superVillainCount)
 {
@@ -24,12 +24,14 @@ void GameManager::setupNewGame(int playerCount, int superVillainCount)
     buildDecks(superVillainCount);
     createPlayers(playerCount);
     dealStartingHands();
+    determineFirstPlayer();
 
     qDebug() << "[GameManager] Przygotowanie gry zakończone. Gra gotowa do rozpoczęcia.";
 }
 
 void GameManager::loadCardData()
 {
+    // Ta metoda pozostaje bez zmian
     QList<Card*> allCards = m_cardLoader.loadCardsFromFile("cards.json");
     if (allCards.isEmpty()) {
         qWarning() << "[GameManager] BŁĄD: Nie udało się wczytać definicji kart.";
@@ -43,6 +45,7 @@ void GameManager::loadCardData()
 
 void GameManager::buildDecks(int superVillainCount)
 {
+    // Ta metoda pozostaje bez zmian
     qDebug() << "[GameManager] Rozpoczynam budowanie talii...";
     m_mainDeck.clear();
     m_kickStack.clear();
@@ -85,6 +88,7 @@ void GameManager::buildDecks(int superVillainCount)
 
 void GameManager::prepareSuperVillainStack(int count)
 {
+    // Ta metoda pozostaje bez zmian
     QList<Card*> allSuperVillains;
     for(Card* card : m_cardsById.values()) {
         if(card->cardType() == Card::SuperVillain) {
@@ -108,6 +112,7 @@ void GameManager::prepareSuperVillainStack(int count)
 
 void GameManager::createPlayers(int count)
 {
+    // Ta metoda pozostaje bez zmian
     qDebug() << "[GameManager] Tworzenie graczy...";
     qDeleteAll(m_players);
     m_players.clear();
@@ -120,22 +125,26 @@ void GameManager::createPlayers(int count)
         return;
     }
 
+    QStringList heroPool = {"the_flash", "batman", "superman", "wonder_woman", "green_lantern", "aquaman", "cyborg"};
+    std::shuffle(heroPool.begin(), heroPool.end(), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()));
+
     for (int i = 0; i < count; ++i) {
-        QString heroId = QString("Player%1_Hero").arg(i + 1);
+        QString heroId = heroPool.value(i, QString("Player%1_Hero").arg(i + 1));
         Player* newPlayer = new Player(heroId, this);
 
         newPlayer->prepareStartingDeck(punchCard, vulnerabilityCard);
         m_players.append(newPlayer);
-        qDebug() << "  - Stworzono gracza" << (i + 1) << "i przygotowano jego talię startową.";
+        qDebug() << "  - Stworzono gracza" << (i + 1) << "z bohaterem" << heroId << "i przygotowano jego talię startową.";
     }
 }
 
 void GameManager::dealStartingHands()
 {
+    // Ta metoda pozostaje bez zmian
     qDebug() << "[GameManager] Rozdawanie kart startowych...";
     for (int i = 0; i < m_players.count(); ++i) {
         m_players[i]->drawCards(5);
-        qDebug() << "  - Gracz" << (i + 1) << "dobrał 5 kart.";
+        qDebug() << "  - Gracz" << (i + 1) << "(" << m_players[i]->heroId() << ")" << "dobrał 5 kart.";
     }
 
     qDebug() << "\n====== WERYFIKACJA STANU GRY ======";
@@ -144,6 +153,26 @@ void GameManager::dealStartingHands()
         for(Card* card : m_players[i]->hand()) {
             handContents.append(card->name("pl"));
         }
-        qDebug() << "Ręka Gracza" << (i + 1) << ":" << handContents.join(", ");
+        qDebug() << "Ręka Gracza" << (i + 1) << "(" << m_players[i]->heroId() << "):" << handContents.join(", ");
+    }
+}
+
+void GameManager::determineFirstPlayer()
+{
+    // Ta metoda pozostaje bez zmian
+    qDebug() << "[GameManager] Wybieranie pierwszego gracza...";
+
+    for(int i = 0; i < m_players.count(); ++i) {
+        if(m_players[i]->heroId() == "the_flash") {
+            m_currentPlayer = m_players[i];
+            qDebug() << "  -> Gracz" << (i + 1) << "gra jako Flash i zaczyna grę!";
+            return;
+        }
+    }
+
+    if (!m_players.isEmpty()) {
+        int firstPlayerIndex = QRandomGenerator::global()->bounded(m_players.size());
+        m_currentPlayer = m_players[firstPlayerIndex];
+        qDebug() << "  -> Losowo wybrano gracza" << firstPlayerIndex + 1 << "do rozpoczęcia gry.";
     }
 }

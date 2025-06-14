@@ -12,14 +12,15 @@ class Player : public QObject
 public:
     explicit Player(const QString &heroId, QObject *parent = nullptr);
 
+    // Nowa publiczna metoda
+    QString heroId() const;
+
     void prepareStartingDeck(Card* punchCard, Card* vulnerabilityCard);
     void drawCards(int count);
-
-    // Metoda dająca wgląd do ręki gracza (do celów testowych)
     const QList<Card*>& hand() const;
 
 private:
-    void shuffleDiscardIntoDeck(); // Nowa metoda pomocnicza
+    void shuffleDiscardIntoDeck();
 
     QString m_heroId;
     QList<Card*> m_deck;

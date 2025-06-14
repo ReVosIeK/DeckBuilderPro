@@ -22,6 +22,7 @@ private:
     void prepareSuperVillainStack(int count);
     void createPlayers(int count);
     void dealStartingHands();
+    void determineFirstPlayer();
 
     CardLoader m_cardLoader;
 
