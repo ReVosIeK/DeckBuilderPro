@@ -10,6 +10,7 @@
 
 GameManager::GameManager(QObject *parent) : QObject(parent)
 {
+    // Konstruktor
 }
 
 void GameManager::setupNewGame(int playerCount, int superVillainCount)
@@ -19,6 +20,10 @@ void GameManager::setupNewGame(int playerCount, int superVillainCount)
     if (m_cardsById.isEmpty()) return;
 
     buildDecks(superVillainCount);
+
+    createPlayers(playerCount);
+
+    // TODO: dealStartingHands();
 
     qDebug() << "[GameManager] Przygotowanie gry zakończone.";
 }
@@ -88,8 +93,6 @@ void GameManager::prepareSuperVillainStack(int count)
     }
 
     Card* rasAlGhul = m_cardsById.value("ras_al_ghul");
-
-    // ZMIANA: Poprawiona nazwa metody z removeAllOne na removeOne
     allSuperVillains.removeOne(rasAlGhul);
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -103,5 +106,28 @@ void GameManager::prepareSuperVillainStack(int count)
     }
 }
 
-void GameManager::createPlayers(int count) { /* ... */ }
-void GameManager::dealStartingHands() { /* ... */ }
+void GameManager::createPlayers(int count)
+{
+    qDebug() << "[GameManager] Tworzenie graczy...";
+    qDeleteAll(m_players);
+    m_players.clear();
+
+    Card* punchCard = m_cardsById.value("punch");
+    Card* vulnerabilityCard = m_cardsById.value("vulnerability");
+
+    if (!punchCard || !vulnerabilityCard) {
+        qWarning() << "Nie można znaleźć kart startowych 'punch' lub 'vulnerability' w załadowanych danych!";
+        return;
+    }
+
+    for (int i = 0; i < count; ++i) {
+        QString heroId = QString("Player%1_Hero").arg(i + 1);
+        Player* newPlayer = new Player(heroId, this);
+
+        newPlayer->prepareStartingDeck(punchCard, vulnerabilityCard);
+        m_players.append(newPlayer);
+        qDebug() << "  - Stworzono gracza" << (i + 1) << "i przygotowano jego talię startową.";
+    }
+}
+
+void GameManager::dealStartingHands() { /* Do implementacji w przyszłości */ }
