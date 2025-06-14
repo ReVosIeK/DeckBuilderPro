@@ -15,7 +15,12 @@ public:
     void prepareStartingDeck(Card* punchCard, Card* vulnerabilityCard);
     void drawCards(int count);
 
+    // Metoda dająca wgląd do ręki gracza (do celów testowych)
+    const QList<Card*>& hand() const;
+
 private:
+    void shuffleDiscardIntoDeck(); // Nowa metoda pomocnicza
+
     QString m_heroId;
     QList<Card*> m_deck;
     QList<Card*> m_hand;

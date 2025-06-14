@@ -8,10 +8,12 @@
 #include <algorithm>
 #include <chrono>
 
+// === POCZĄTEK POPRAWKI: Przywrócenie brakującego konstruktora ===
 GameManager::GameManager(QObject *parent) : QObject(parent)
 {
-    // Konstruktor
+    // Konstruktor, który był przypadkowo usunięty
 }
+// === KONIEC POPRAWKI ===
 
 void GameManager::setupNewGame(int playerCount, int superVillainCount)
 {
@@ -20,12 +22,10 @@ void GameManager::setupNewGame(int playerCount, int superVillainCount)
     if (m_cardsById.isEmpty()) return;
 
     buildDecks(superVillainCount);
-
     createPlayers(playerCount);
+    dealStartingHands();
 
-    // TODO: dealStartingHands();
-
-    qDebug() << "[GameManager] Przygotowanie gry zakończone.";
+    qDebug() << "[GameManager] Przygotowanie gry zakończone. Gra gotowa do rozpoczęcia.";
 }
 
 void GameManager::loadCardData()
@@ -130,4 +130,20 @@ void GameManager::createPlayers(int count)
     }
 }
 
-void GameManager::dealStartingHands() { /* Do implementacji w przyszłości */ }
+void GameManager::dealStartingHands()
+{
+    qDebug() << "[GameManager] Rozdawanie kart startowych...";
+    for (int i = 0; i < m_players.count(); ++i) {
+        m_players[i]->drawCards(5);
+        qDebug() << "  - Gracz" << (i + 1) << "dobrał 5 kart.";
+    }
+
+    qDebug() << "\n====== WERYFIKACJA STANU GRY ======";
+    for (int i = 0; i < m_players.count(); ++i) {
+        QStringList handContents;
+        for(Card* card : m_players[i]->hand()) {
+            handContents.append(card->name("pl"));
+        }
+        qDebug() << "Ręka Gracza" << (i + 1) << ":" << handContents.join(", ");
+    }
+}
