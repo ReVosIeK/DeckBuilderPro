@@ -1,19 +1,11 @@
 # ninja log v6
-25	218	7716005395315213	DeckBuilderPro_autogen/timestamp	e0d4cf9479954334
-25	218	7716005395315213	DeckBuilderPro_autogen/mocs_compilation.cpp	e0d4cf9479954334
-25	218	7716005395315213	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/timestamp	e0d4cf9479954334
-843	3058	7715995074326802	CMakeFiles/DeckBuilderPro.dir/Player.cpp.obj	ef59751e2c937591
-840	2988	7715995074296789	CMakeFiles/DeckBuilderPro.dir/Card.cpp.obj	24810bda2ae38546
-25	218	7716005395315213	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/mocs_compilation.cpp	e0d4cf9479954334
-218	2982	7716001294249052	CMakeFiles/DeckBuilderPro.dir/main.cpp.obj	30070f417056da56
-944	4028	7715998249289444	CMakeFiles/DeckBuilderPro.dir/DeckBuilderPro_autogen/mocs_compilation.cpp.obj	2cb183ed4440d4ac
-2983	3080	7716001321889041	DeckBuilderPro.exe	d511514c64c24715
-951	4966	7715998249359499	CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj	cfc9a3453a8ed590
 26	836	7716006455206180	DeckBuilderPro_autogen/timestamp	e0d4cf9479954334
 26	836	7716006455206180	DeckBuilderPro_autogen/mocs_compilation.cpp	e0d4cf9479954334
 26	836	7716006455206180	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/timestamp	e0d4cf9479954334
+843	3058	7715995074326802	CMakeFiles/DeckBuilderPro.dir/Player.cpp.obj	ef59751e2c937591
+840	2988	7715995074296789	CMakeFiles/DeckBuilderPro.dir/Card.cpp.obj	24810bda2ae38546
 26	836	7716006455206180	C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/mocs_compilation.cpp	e0d4cf9479954334
 840	3780	7716006456086180	CMakeFiles/DeckBuilderPro.dir/main.cpp.obj	30070f417056da56
 837	3790	7716006456056186	CMakeFiles/DeckBuilderPro.dir/DeckBuilderPro_autogen/mocs_compilation.cpp.obj	2cb183ed4440d4ac
-843	4495	7716006456126185	CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj	cfc9a3453a8ed590
 4495	4596	7716006492646176	DeckBuilderPro.exe	d511514c64c24715
+843	4495	7716006456126185	CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj	cfc9a3453a8ed590
