@@ -23,6 +23,9 @@ add_executable(DeckBuilderPro
     CardLoader.h
     GameManager.h # <<< Poprawiono na wielką literę
     json.hpp
+
+    cards.json
+    deck_composition.json
 )
 
 # Linkujemy już tylko z modułem Core!

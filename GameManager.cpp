@@ -25,32 +25,73 @@ void GameManager::setupNewGame(int playerCount, int superVillainCount)
     createPlayers(playerCount);
     dealStartingHands();
     determineFirstPlayer();
+    refillLineUp(); // Uzupełniamy Line-Up na start gry
 
     qDebug() << "[GameManager] Przygotowanie gry zakończone. Gra gotowa do rozpoczęcia.";
 }
 
-void GameManager::startFirstTurn()
+void GameManager::playFullTurnForCurrentPlayer_Test()
 {
     if (!m_currentPlayer) {
-        qWarning() << "[GameManager] Nie można rozpocząć tury, nie wybrano pierwszego gracza!";
+        qWarning() << "[GameManager] Błąd krytyczny: Brak aktywnego gracza.";
         return;
     }
 
-    qDebug() << "\n====== TURA 1: Gracz" << m_players.indexOf(m_currentPlayer) + 1 << "(" << m_currentPlayer->heroId() << ") ======";
+    qDebug() << "\n====== TURA GRACZA" << m_players.indexOf(m_currentPlayer) + 1 << "(" << m_currentPlayer->heroId() << ") ======";
+
+    // Wyświetlenie Line-Up na początku tury
+    QStringList lineUpNames;
+    for(const auto& card : m_lineUp) if(card) lineUpNames.append(card->name("pl"));
+    qDebug() << "Line-Up na początku tury:" << lineUpNames.join(", ");
 
     while(!m_currentPlayer->hand().isEmpty()) {
-        m_currentPlayer->playCard(0);
+        Card* playedCard = m_currentPlayer->playCard(0);
+        if(playedCard) {
+            resolveCardEffect(playedCard);
+        }
+    }
+}
+
+void GameManager::buyCardFromLineUp(int lineUpIndex)
+{
+    if (!m_currentPlayer) return;
+
+    if(lineUpIndex < 0 || lineUpIndex >= m_lineUp.size() || !m_lineUp[lineUpIndex]) {
+        qWarning() << "[GameManager] Próba zakupu nieprawidłowej karty z Line-Up o indeksie:" << lineUpIndex;
+        return;
     }
 
-    m_currentPlayer->endTurn();
+    Card* cardToBuy = m_lineUp[lineUpIndex];
+    qDebug() << "[GameManager] Gracz próbuje kupić" << cardToBuy->name("pl") << "za koszt" << cardToBuy->cost() << "(posiada" << m_currentPlayer->currentPower() << "Mocy)";
 
-    qDebug() << "====== KONIEC TURY 1 ======";
+    if (m_currentPlayer->currentPower() >= cardToBuy->cost()) {
+        m_currentPlayer->spendPower(cardToBuy->cost());
+        m_currentPlayer->gainCard(cardToBuy);
 
-    QStringList handContents;
-    for(Card* card : m_currentPlayer->hand()) {
-        handContents.append(card->name("pl"));
+        m_lineUp[lineUpIndex] = nullptr;
+
+        qDebug() << "  -> Sukces! Karta" << cardToBuy->name("pl") << "kupiona. Pozostało Mocy:" << m_currentPlayer->currentPower();
+    } else {
+        qDebug() << "  -> Porażka. Niewystarczająca ilość Mocy.";
     }
-    qDebug() << "Nowa ręka Gracza" << m_players.indexOf(m_currentPlayer) + 1 << ":" << handContents.join(", ");
+}
+
+
+Player* GameManager::currentPlayer() const
+{
+    return m_currentPlayer;
+}
+
+void GameManager::resolveCardEffect(Card* card)
+{
+    if (!card || !m_currentPlayer) return;
+    qDebug() << "  -> Rozpatrywanie efektu karty:" << card->name("pl");
+    m_currentPlayer->addPower(card->power());
+
+    if (card->id() == "kid_flash" || card->id() == "super_speed") {
+        qDebug() << "    -> Efekt: Dobierz kartę.";
+        m_currentPlayer->drawCards(1);
+    }
 }
 
 void GameManager::loadCardData()
@@ -112,7 +153,7 @@ void GameManager::prepareSuperVillainStack(int count)
 {
     QList<Card*> allSuperVillains;
     for(Card* card : m_cardsById.values()) {
-        if(card->is(Card::SuperVillain)) { // Używamy is() dla poprawności
+        if(card->is(Card::SuperVillain)) {
             allSuperVillains.append(card);
         }
     }
@@ -183,7 +224,7 @@ void GameManager::determineFirstPlayer()
     for(int i = 0; i < m_players.count(); ++i) {
         if(m_players[i]->heroId() == "the_flash") {
             m_currentPlayer = m_players[i];
-            qDebug() << "  -> Gracz" << (i + 1) << "gra jako Flash i zaczyna grę!";
+            qDebug() << "  -> Gracz" << (i + 1) << "(" << m_currentPlayer->heroId() << ") gra jako Flash i zaczyna grę!";
             return;
         }
     }
@@ -191,6 +232,20 @@ void GameManager::determineFirstPlayer()
     if (!m_players.isEmpty()) {
         int firstPlayerIndex = QRandomGenerator::global()->bounded(m_players.size());
         m_currentPlayer = m_players[firstPlayerIndex];
-        qDebug() << "  -> Losowo wybrano gracza" << firstPlayerIndex + 1 << "do rozpoczęcia gry.";
+        qDebug() << "  -> Losowo wybrano gracza" << firstPlayerIndex + 1 << "(" << m_currentPlayer->heroId() << ")" << "do rozpoczęcia gry.";
+    }
+}
+
+void GameManager::refillLineUp()
+{
+    qDebug() << "[GameManager] Uzupełnianie Line-Up...";
+    for(int i = 0; i < 5; ++i) {
+        // Jeśli slot jest pusty i mamy karty w talii głównej
+        if(i >= m_lineUp.size() || !m_lineUp[i]) {
+            if(!m_mainDeck.isEmpty()) {
+                if(i >= m_lineUp.size()) m_lineUp.append(m_mainDeck.takeFirst());
+                else m_lineUp[i] = m_mainDeck.takeFirst();
+            }
+        }
     }
 }

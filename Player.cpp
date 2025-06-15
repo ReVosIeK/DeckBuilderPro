@@ -24,6 +24,23 @@ void Player::addPower(int amount)
     m_currentPower += amount;
 }
 
+void Player::spendPower(int amount)
+{
+    if (amount > m_currentPower) {
+        qWarning() << "Próba wydania więcej mocy niż jest dostępna!";
+        m_currentPower = 0;
+    } else {
+        m_currentPower -= amount;
+    }
+}
+
+void Player::gainCard(Card *card)
+{
+    if (card) {
+        m_discardPile.append(card);
+    }
+}
+
 void Player::prepareStartingDeck(Card* punchCard, Card* vulnerabilityCard)
 {
     m_deck.clear();
@@ -57,26 +74,19 @@ Card* Player::playCard(int cardIndex)
         qWarning() << "Próba zagrania nieistniejącej karty o indeksie:" << cardIndex;
         return nullptr;
     }
-
     Card* card = m_hand.takeAt(cardIndex);
     m_playedCards.append(card);
-
-    // Zwracamy kartę, aby GameManager mógł ją przetworzyć
     return card;
 }
 
 void Player::endTurn()
 {
     qDebug() << "  -> Gracz" << heroId() << "kończy turę z" << m_currentPower << "Mocy.";
-
     m_discardPile.append(m_hand);
     m_hand.clear();
-
     m_discardPile.append(m_playedCards);
     m_playedCards.clear();
-
     m_currentPower = 0;
-
     drawCards(5);
 }
 
@@ -87,4 +97,9 @@ const QList<Card*>& Player::hand() const
 
 void Player::shuffleDiscardIntoDeck()
 {
-    qDebug() << "    -> Talia gracza"
+    qDebug() << "    -> Talia gracza" << m_heroId << "jest pusta. Tasowanie stosu odrzuconych...";
+    m_deck = m_discardPile;
+    m_discardPile.clear();
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(m_deck.begin(), m_deck.end(), std::default_random_engine(seed));
+}

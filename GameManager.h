@@ -15,13 +15,10 @@ public:
     explicit GameManager(QObject *parent = nullptr);
 
     void setupNewGame(int playerCount, int superVillainCount = 8);
-    void takeTurnForCurrentPlayer(); // Zastępuje startFirstTurn
+    void playFullTurnForCurrentPlayer_Test();
+    void buyCardFromLineUp(int lineUpIndex);
 
-    // Metoda do podglądania stanu gry
     Player* currentPlayer() const;
-
-private:
-    void resolveCardEffect(Card* card); // <-- Początek naszego Silnika Efektów!
 
 private:
     void loadCardData();
@@ -30,6 +27,8 @@ private:
     void createPlayers(int count);
     void dealStartingHands();
     void determineFirstPlayer();
+    void resolveCardEffect(Card* card);
+    void refillLineUp();
 
     CardLoader m_cardLoader;
 
@@ -39,6 +38,7 @@ private:
     QList<Card*> m_kickStack;
     QList<Card*> m_weaknessStack;
     QList<Card*> m_superVillainStack;
+    QList<Card*> m_lineUp; // Przeniesione z metody do pola klasy
 
     QList<Player*> m_players;
     Player* m_currentPlayer;
