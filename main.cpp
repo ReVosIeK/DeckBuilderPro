@@ -17,14 +17,18 @@ int main(int argc, char *argv[])
 
     // Symulacja fazy zakupów
     qDebug() << "\n====== FAZA ZAKUPÓW ======";
-    game.buyCardFromLineUp(0); // Próba zakupu pierwszej karty
-    game.buyCardFromLineUp(1); // Próba zakupu drugiej karty
+    game.buyCardFromLineUp(0);
+    game.buyKick();
+
+    // Próba pokonania Super-Złoczyńcy
+    game.buySuperVillain();
 
     // Symulacja końca tury
     if(game.currentPlayer()) {
-        game.currentPlayer()->endTurn();
+        game.endTurnActions();
     }
 
     qDebug() << "\n====== APLIKACJA ZAKOŃCZYŁA DZIAŁANIE ======";
+
     return 0;
 }

@@ -25,7 +25,7 @@ void GameManager::setupNewGame(int playerCount, int superVillainCount)
     createPlayers(playerCount);
     dealStartingHands();
     determineFirstPlayer();
-    refillLineUp(); // Uzupełniamy Line-Up na start gry
+    refillLineUp();
 
     qDebug() << "[GameManager] Przygotowanie gry zakończone. Gra gotowa do rozpoczęcia.";
 }
@@ -39,7 +39,6 @@ void GameManager::playFullTurnForCurrentPlayer_Test()
 
     qDebug() << "\n====== TURA GRACZA" << m_players.indexOf(m_currentPlayer) + 1 << "(" << m_currentPlayer->heroId() << ") ======";
 
-    // Wyświetlenie Line-Up na początku tury
     QStringList lineUpNames;
     for(const auto& card : m_lineUp) if(card) lineUpNames.append(card->name("pl"));
     qDebug() << "Line-Up na początku tury:" << lineUpNames.join(", ");
@@ -76,6 +75,52 @@ void GameManager::buyCardFromLineUp(int lineUpIndex)
     }
 }
 
+void GameManager::buyKick()
+{
+    if (!m_currentPlayer) return;
+    if (m_kickStack.isEmpty()) {
+        qDebug() << "[GameManager] Stos Kopniaków jest pusty. Nie można kupić.";
+        return;
+    }
+
+    Card* kickCard = m_kickStack.first();
+    qDebug() << "[GameManager] Gracz próbuje kupić Kopniaka za koszt" << kickCard->cost() << "(posiada" << m_currentPlayer->currentPower() << "Mocy)";
+
+    if (m_currentPlayer->currentPower() >= kickCard->cost()) {
+        m_currentPlayer->spendPower(kickCard->cost());
+        m_currentPlayer->gainCard(m_kickStack.takeFirst());
+        qDebug() << "  -> Sukces! Kopniak kupiony. Pozostało Mocy:" << m_currentPlayer->currentPower();
+    } else {
+        qDebug() << "  -> Porażka. Niewystarczająca ilość Mocy.";
+    }
+}
+
+void GameManager::buySuperVillain()
+{
+    if (!m_currentPlayer) return;
+    if (m_superVillainStack.isEmpty()) {
+        qDebug() << "[GameManager] Stos Super-Złoczyńców jest pusty.";
+        return;
+    }
+
+    Card* svCard = m_superVillainStack.first();
+    qDebug() << "[GameManager] Gracz próbuje pokonać Super-Złoczyńcę" << svCard->name("pl") << "za koszt" << svCard->cost() << "(posiada" << m_currentPlayer->currentPower() << "Mocy)";
+
+    if (m_currentPlayer->currentPower() >= svCard->cost()) {
+        m_currentPlayer->spendPower(svCard->cost());
+        m_currentPlayer->gainCard(m_superVillainStack.takeFirst());
+        qDebug() << "  -> Sukces! Super-Złoczyńca pokonany. Pozostało Mocy:" << m_currentPlayer->currentPower();
+    } else {
+        qDebug() << "  -> Porażka. Niewystarczająca ilość Mocy.";
+    }
+}
+
+void GameManager::endTurnActions()
+{
+    if(!m_currentPlayer) return;
+    m_currentPlayer->endTurn();
+    refillLineUp();
+}
 
 Player* GameManager::currentPlayer() const
 {
@@ -240,11 +285,15 @@ void GameManager::refillLineUp()
 {
     qDebug() << "[GameManager] Uzupełnianie Line-Up...";
     for(int i = 0; i < 5; ++i) {
-        // Jeśli slot jest pusty i mamy karty w talii głównej
-        if(i >= m_lineUp.size() || !m_lineUp[i]) {
+        if (i >= m_lineUp.size()) {
+            // Jeśli slot nie istnieje, dodaj go
             if(!m_mainDeck.isEmpty()) {
-                if(i >= m_lineUp.size()) m_lineUp.append(m_mainDeck.takeFirst());
-                else m_lineUp[i] = m_mainDeck.takeFirst();
+                m_lineUp.append(m_mainDeck.takeFirst());
+            }
+        } else if (!m_lineUp[i]) {
+            // Jeśli slot jest pusty (nullptr), uzupełnij go
+            if(!m_mainDeck.isEmpty()) {
+                m_lineUp[i] = m_mainDeck.takeFirst();
             }
         }
     }

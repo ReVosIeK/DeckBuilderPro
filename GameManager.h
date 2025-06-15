@@ -16,7 +16,12 @@ public:
 
     void setupNewGame(int playerCount, int superVillainCount = 8);
     void playFullTurnForCurrentPlayer_Test();
+
     void buyCardFromLineUp(int lineUpIndex);
+    void buyKick();
+    void buySuperVillain();
+
+    void endTurnActions();
 
     Player* currentPlayer() const;
 
@@ -38,7 +43,7 @@ private:
     QList<Card*> m_kickStack;
     QList<Card*> m_weaknessStack;
     QList<Card*> m_superVillainStack;
-    QList<Card*> m_lineUp; // Przeniesione z metody do pola klasy
+    QList<Card*> m_lineUp;
 
     QList<Player*> m_players;
     Player* m_currentPlayer;

@@ -8,17 +8,17 @@
 
 class Player : public QObject
 {
-    Q_OBJECT // To makro wymaga poprawnego działania AUTOMOC
+    Q_OBJECT
 public:
     explicit Player(const QString &heroId, QObject *parent = nullptr);
 
+    // Metody publiczne
     QString heroId() const;
     void prepareStartingDeck(Card* punchCard, Card* vulnerabilityCard);
     void drawCards(int count);
     const QList<Card*>& hand() const;
     int currentPower() const;
 
-    // Upewnij się, że te trzy metody są w pliku
     void addPower(int amount);
     void spendPower(int amount);
     void gainCard(Card* card);
