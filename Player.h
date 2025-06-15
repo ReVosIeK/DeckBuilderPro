@@ -5,7 +5,7 @@
 #include <QString>
 #include <vector>
 #include <memory>
-#include <QQmlListProperty> // <-- DODANY NAGŁÓWEK
+#include <QQmlListProperty>
 #include "Card.h"
 
 class Player : public QObject
@@ -17,7 +17,6 @@ class Player : public QObject
     Q_PROPERTY(QQmlListProperty<Card> playedCards READ playedCards NOTIFY playedCardsChanged)
     Q_PROPERTY(int discardPileSize READ discardPileSize NOTIFY discardPileChanged)
     Q_PROPERTY(int deckSize READ deckSize NOTIFY deckChanged)
-
 
 public:
     explicit Player(QString name, const std::vector<std::shared_ptr<Card>>& startingDeck, QObject *parent = nullptr);
@@ -33,6 +32,9 @@ public:
     void drawHand();
     void endTurn();
 
+    Q_INVOKABLE void playCard(int index);
+    void spendPower(int amount); // Deklaracja metody do wydawania mocy
+
 signals:
     void currentPowerChanged();
     void handChanged();
@@ -40,7 +42,7 @@ signals:
     void discardPileChanged();
     void deckChanged();
 
-private:
+public:
     QString m_name;
     int m_currentPower;
 
@@ -49,6 +51,7 @@ private:
     std::vector<Card*> m_playedCards;
     std::vector<Card*> m_discardPile;
 
+private:
     void shuffleDeck();
 };
 

@@ -3,8 +3,14 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <algorithm> // Dodajemy dla std::shuffle
 
 bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deckCompositionPath) {
+    m_cardPrototypes.clear();
+    m_superVillains.clear();
+    m_startingDeck.clear();
+    m_mainDeck.clear();
+
     QFile cardsFile(QString::fromStdString(cardsPath));
     if (!cardsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning("Couldn't open cards file: %s", cardsPath.c_str());
@@ -13,24 +19,15 @@ bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deck
     QByteArray cardsData = cardsFile.readAll();
     json cardsJson = json::parse(cardsData.toStdString(), nullptr, false);
 
-    if (cardsJson.is_discarded()) {
-        qWarning("Failed to parse cards.json. It might be malformed.");
-        return false;
-    }
-
-    if (!cardsJson.is_array()) {
+    if (cardsJson.is_discarded() || !cardsJson.is_array()) {
         qWarning("Invalid format in cards.json: root must be an array.");
         return false;
     }
 
-    // Wczytywanie prototypów kart
     for (const auto& cardDef : cardsJson) {
         if (!cardDef.is_object()) continue;
 
-        // 1. Stwórz pusty wskaźnik na kartę (prototyp)
         auto card = std::make_shared<Card>();
-
-        // 2. Wypełnij jego publiczne pola danymi z JSON
         card->m_id = QString::fromStdString(cardDef.value("id", ""));
         card->m_names["pl_PL"] = QString::fromStdString(cardDef.value("name_pl", ""));
         card->m_names["en_US"] = QString::fromStdString(cardDef.value("name_en", ""));
@@ -43,10 +40,13 @@ bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deck
         card->m_isSpecial = false;
 
         m_cardPrototypes[card->m_id.toStdString()] = card;
-    }
-    qInfo() << "Loaded" << m_cardPrototypes.size() << "card prototypes.";
 
-    // Przygotowanie talii startowej
+        if (card->m_type == "Super-Villain") {
+            m_superVillains.push_back(card);
+        }
+    }
+    qInfo() << "Loaded" << m_cardPrototypes.size() << "card prototypes, including" << m_superVillains.size() << "Super-Villains.";
+
     auto punchProto = getCardById("punch");
     auto vulnerabilityProto = getCardById("vulnerability");
     if(punchProto && vulnerabilityProto) {
@@ -56,7 +56,6 @@ bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deck
     } else {
         qWarning("Could not generate starting deck, missing 'punch' or 'vulnerability' prototype.");
     }
-
 
     QFile deckFile(QString::fromStdString(deckCompositionPath));
     if (!deckFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -71,7 +70,6 @@ bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deck
         return true;
     }
 
-    // Tworzenie talii głównej
     createDeck(deckJson, m_mainDeck);
     qInfo() << "Generated main deck with" << m_mainDeck.size() << "cards.";
 
@@ -101,6 +99,11 @@ const std::vector<std::shared_ptr<Card>>& CardLoader::getStartingDeck() const {
 
 const std::vector<std::shared_ptr<Card>>& CardLoader::getMainDeck() const {
     return m_mainDeck;
+}
+
+const std::vector<std::shared_ptr<Card>>& CardLoader::getSuperVillains() const
+{
+    return m_superVillains;
 }
 
 std::shared_ptr<Card> CardLoader::getCardById(const std::string& id) const {

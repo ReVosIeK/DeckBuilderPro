@@ -7,10 +7,7 @@ Player::Player(QString name, const std::vector<std::shared_ptr<Card>>& startingD
     : QObject(parent), m_name(name), m_currentPower(0)
 {
     for (const auto& cardPrototype : startingDeck) {
-        // 1. Tworzymy nową, pustą instancję karty, ustawiając gracza jako rodzica
         Card* newCard = new Card(this);
-
-        // 2. Kopiujemy wszystkie dane z prototypu do nowej instancji
         newCard->m_id = cardPrototype->m_id;
         newCard->m_names = cardPrototype->m_names;
         newCard->m_type = cardPrototype->m_type;
@@ -19,8 +16,6 @@ Player::Player(QString name, const std::vector<std::shared_ptr<Card>>& startingD
         newCard->m_power = cardPrototype->m_power;
         newCard->m_texts = cardPrototype->m_texts;
         newCard->m_isSpecial = cardPrototype->m_isSpecial;
-
-        // 3. Dodajemy nową, w pełni skonfigurowaną kartę do talii gracza
         m_deck.push_back(newCard);
     }
     shuffleDeck();
@@ -32,17 +27,42 @@ int Player::currentPower() const { return m_currentPower; }
 int Player::discardPileSize() const { return m_discardPile.size(); }
 int Player::deckSize() const { return m_deck.size(); }
 
+void Player::playCard(int index)
+{
+    if (index < 0 || index >= m_hand.size()) {
+        qWarning() << "Invalid card index to play:" << index;
+        return;
+    }
+
+    Card* card = m_hand.at(index);
+    m_hand.erase(m_hand.begin() + index);
+    m_playedCards.push_back(card);
+
+    m_currentPower += card->power();
+    qInfo() << name() << "played" << card->getName(Card::currentLanguage) << "for" << card->power() << "power. Total power:" << m_currentPower;
+
+    emit handChanged();
+    emit playedCardsChanged();
+    emit currentPowerChanged();
+}
+
+void Player::spendPower(int amount)
+{
+    if (amount > m_currentPower) {
+        qWarning() << "Attempted to spend more power than available!";
+        return;
+    }
+    m_currentPower -= amount;
+    emit currentPowerChanged();
+}
 
 QQmlListProperty<Card> Player::hand()
 {
-    // POPRAWKA: Przekazujemy 'this' jako wskaźnik do danych, a nie nullptr
     return QQmlListProperty<Card>(this, this,
                                   [](QQmlListProperty<Card>* prop) -> qsizetype {
-                                      // Zwraca rozmiar wektora m_hand
                                       return reinterpret_cast<Player*>(prop->data)->m_hand.size();
                                   },
                                   [](QQmlListProperty<Card>* prop, qsizetype index) -> Card* {
-                                      // Zwraca wskaźnik do karty na podanym indeksie
                                       return reinterpret_cast<Player*>(prop->data)->m_hand.at(index);
                                   }
                                   );
@@ -50,19 +70,15 @@ QQmlListProperty<Card> Player::hand()
 
 QQmlListProperty<Card> Player::playedCards()
 {
-    // POPRAWKA: Przekazujemy 'this' jako wskaźnik do danych, a nie nullptr
     return QQmlListProperty<Card>(this, this,
                                   [](QQmlListProperty<Card>* prop) -> qsizetype {
-                                      // Zwraca rozmiar wektora m_playedCards
                                       return reinterpret_cast<Player*>(prop->data)->m_playedCards.size();
                                   },
                                   [](QQmlListProperty<Card>* prop, qsizetype index) -> Card* {
-                                      // Zwraca wskaźnik do karty na podanym indeksie
                                       return reinterpret_cast<Player*>(prop->data)->m_playedCards.at(index);
                                   }
                                   );
 }
-
 
 void Player::shuffleDeck() {
     std::random_device rd;
@@ -74,7 +90,7 @@ void Player::drawHand() {
     for (int i = 0; i < 5; ++i) {
         if (m_deck.empty()) {
             if (m_discardPile.empty()) {
-                break; // No more cards to draw
+                break;
             }
             m_deck = m_discardPile;
             m_discardPile.clear();

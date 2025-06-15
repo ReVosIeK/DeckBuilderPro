@@ -33,7 +33,7 @@ add_executable(DeckBuilderPro
     json.hpp
     cards.json
     deck_composition.json
-    build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/logs/session.log
+    build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/logs/session.txt
 )
 
 # Linkowanie bibliotek Qt6
