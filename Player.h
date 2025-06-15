@@ -3,40 +3,53 @@
 
 #include <QObject>
 #include <QString>
-#include <QList>
+#include <vector>
+#include <memory>
+#include <QQmlListProperty> // <-- DODANY NAGŁÓWEK
 #include "Card.h"
 
 class Player : public QObject
 {
     Q_OBJECT
-public:
-    explicit Player(const QString &heroId, QObject *parent = nullptr);
+    Q_PROPERTY(QString name READ name CONSTANT)
+    Q_PROPERTY(int currentPower READ currentPower NOTIFY currentPowerChanged)
+    Q_PROPERTY(QQmlListProperty<Card> hand READ hand NOTIFY handChanged)
+    Q_PROPERTY(QQmlListProperty<Card> playedCards READ playedCards NOTIFY playedCardsChanged)
+    Q_PROPERTY(int discardPileSize READ discardPileSize NOTIFY discardPileChanged)
+    Q_PROPERTY(int deckSize READ deckSize NOTIFY deckChanged)
 
-    // Metody publiczne
-    QString heroId() const;
-    void prepareStartingDeck(Card* punchCard, Card* vulnerabilityCard);
-    void drawCards(int count);
-    const QList<Card*>& hand() const;
+
+public:
+    explicit Player(QString name, const std::vector<std::shared_ptr<Card>>& startingDeck, QObject *parent = nullptr);
+
+    QString name() const;
     int currentPower() const;
 
-    void addPower(int amount);
-    void spendPower(int amount);
-    void gainCard(Card* card);
+    QQmlListProperty<Card> hand();
+    QQmlListProperty<Card> playedCards();
+    int discardPileSize() const;
+    int deckSize() const;
 
-    Card* playCard(int cardIndex);
+    void drawHand();
     void endTurn();
 
-private:
-    void shuffleDiscardIntoDeck();
+signals:
+    void currentPowerChanged();
+    void handChanged();
+    void playedCardsChanged();
+    void discardPileChanged();
+    void deckChanged();
 
-    QString m_heroId;
+private:
+    QString m_name;
     int m_currentPower;
 
-    QList<Card*> m_deck;
-    QList<Card*> m_hand;
-    QList<Card*> m_discardPile;
-    QList<Card*> m_activeLocations;
-    QList<Card*> m_playedCards;
+    std::vector<Card*> m_deck;
+    std::vector<Card*> m_hand;
+    std::vector<Card*> m_playedCards;
+    std::vector<Card*> m_discardPile;
+
+    void shuffleDeck();
 };
 
 #endif // PLAYER_H

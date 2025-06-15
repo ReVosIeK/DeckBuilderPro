@@ -1,59 +1,57 @@
 #ifndef CARD_H
 #define CARD_H
 
+#include <QObject>
 #include <QString>
 #include <QMap>
 
-class Card
+class Card : public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(QString id READ id CONSTANT)
+    Q_PROPERTY(QString type READ type CONSTANT)
+    Q_PROPERTY(QString subtype READ subtype CONSTANT)
+    Q_PROPERTY(int cost READ cost CONSTANT)
+    Q_PROPERTY(int power READ power CONSTANT)
+    Q_PROPERTY(bool isSpecial READ isSpecial CONSTANT)
+    Q_PROPERTY(QString name READ name NOTIFY languageChanged) // Właściwość do odczytu w QML
+    Q_PROPERTY(QString text READ text NOTIFY languageChanged) // Właściwość do odczytu w QML
+
 public:
-    enum CardType {
-        Starter,
-        Hero,
-        Villain,
-        SuperVillain,
-        Equipment,
-        SuperPower,
-        Location,
-        Kick,
-        Weakness,
-        Unknown
-    };
+    explicit Card(QObject *parent = nullptr);
 
-    Card();
-
+    // Getters dla właściwości
     QString id() const;
-    QString name(const QString& lang) const;
+    QString type() const;
+    QString subtype() const;
     int cost() const;
-    int vp() const;
-    CardType cardType() const;
-    QString ability(const QString& lang) const;
-    QString imagePath() const;
     int power() const;
-    QList<QString> effectTags() const;
+    bool isSpecial() const;
 
-    bool is(CardType type) const;
+    // Metody Q_INVOKABLE do jawnego pobierania danych w danym języku
+    Q_INVOKABLE QString getName(const QString& lang) const;
+    Q_INVOKABLE QString getText(const QString& lang) const;
 
-    void setId(const QString &id);
-    void addName(const QString& lang, const QString& name);
-    void setCost(int cost);
-    void setVp(int vp);
-    void setCardType(const QString &typeStr);
-    void addAbility(const QString& lang, const QString& ability);
-    void setImagePath(const QString &imagePath);
-    void setPower(int power);
-    void setEffectTags(const QList<QString> &effectTags);
-
-private:
+    // Pola publiczne do łatwego wypełniania w CardLoader
     QString m_id;
     QMap<QString, QString> m_names;
+    QString m_type;
+    QString m_subtype;
     int m_cost;
-    int m_vp;
-    CardType m_cardType;
-    QMap<QString, QString> m_abilities;
-    QString m_imagePath;
     int m_power;
-    QList<QString> m_effectTags;
+    QMap<QString, QString> m_texts;
+    bool m_isSpecial;
+
+    // Język, który ma być używany przez właściwości Q_PROPERTY
+    static QString currentLanguage;
+
+signals:
+    void languageChanged();
+
+private:
+    // Prywatne implementacje getterów dla właściwości Q_PROPERTY
+    QString name() const;
+    QString text() const;
 };
 
 #endif // CARD_H

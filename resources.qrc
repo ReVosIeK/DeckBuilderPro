@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+    <file>main.qml</file>
+    <file>cards.json</file>
+    <file>deck_composition.json</file>
+</qresource>
+</RCC>

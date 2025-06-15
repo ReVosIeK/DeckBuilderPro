@@ -2,50 +2,32 @@
 #define GAMEMANAGER_H
 
 #include <QObject>
-#include <QList>
-#include <QMap>
-#include <QString>
-#include "CardLoader.h"
+#include <vector>
+#include <string>
+#include <memory>
 #include "Player.h"
+#include "CardLoader.h"
 
 class GameManager : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(Player* currentPlayer READ currentPlayer NOTIFY currentPlayerChanged)
+
 public:
     explicit GameManager(QObject *parent = nullptr);
+    void prepareGame(int numberOfPlayers);
 
-    void setupNewGame(int playerCount, int superVillainCount = 8);
-    void nextTurn();
-
-    void playCardForCurrentPlayer(int cardIndex);
-    void buyCardFromLineUp(int lineUpIndex);
-    void buyKick();
-    void buySuperVillain();
-
-    const QList<Player*>& players() const;
     Player* currentPlayer() const;
-    const QList<Card*>& lineUp() const;
+
+signals:
+    void gameReady();
+    void currentPlayerChanged();
 
 private:
-    void loadCardData();
-    void buildDecks(int superVillainCount);
-    void prepareSuperVillainStack(int count);
-    void createPlayers(int count);
-    void dealStartingHands();
-    void determineFirstPlayer();
-    void resolveCardEffect(Card* card);
-    void refillLineUp();
-    void endTurnActions();
-
     CardLoader m_cardLoader;
-    QMap<QString, Card*> m_cardsById;
-    QList<Card*> m_mainDeck;
-    QList<Card*> m_kickStack;
-    QList<Card*> m_weaknessStack;
-    QList<Card*> m_superVillainStack;
-    QList<Card*> m_lineUp;
-    QList<Player*> m_players;
-    Player* m_currentPlayer;
+    std::vector<std::shared_ptr<Card>> m_mainDeck;
+    std::vector<Player*> m_players;
+    int m_currentPlayerIndex;
 };
 
 #endif // GAMEMANAGER_H

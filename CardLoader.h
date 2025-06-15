@@ -1,23 +1,28 @@
 #ifndef CARDLOADER_H
 #define CARDLOADER_H
 
-#include <QObject>
-#include <QList>
-#include <QString>
+#include <string>
+#include <vector>
+#include <map>
+#include <memory>
 #include "Card.h"
 #include "json.hpp"
 
 using json = nlohmann::json;
 
-class CardLoader : public QObject
-{
-    Q_OBJECT
+class CardLoader {
 public:
-    explicit CardLoader(QObject *parent = nullptr);
+    bool loadCards(const std::string& cardsPath, const std::string& deckCompositionPath);
+    const std::vector<std::shared_ptr<Card>>& getStartingDeck() const;
+    const std::vector<std::shared_ptr<Card>>& getMainDeck() const;
+    std::shared_ptr<Card> getCardById(const std::string& id) const;
 
-    QList<Card*> loadCardsFromFile(const QString& filePath);
+private:
+    std::map<std::string, std::shared_ptr<Card>> m_cardPrototypes;
+    std::vector<std::shared_ptr<Card>> m_startingDeck;
+    std::vector<std::shared_ptr<Card>> m_mainDeck;
+
+    void createDeck(const json& composition, std::vector<std::shared_ptr<Card>>& deck);
 };
 
 #endif // CARDLOADER_H
-
-

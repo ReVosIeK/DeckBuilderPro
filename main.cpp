@@ -1,103 +1,106 @@
-#include <QCoreApplication>
-#include <QDebug>
-#include <QTextStream>
-#include <QString>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include "GameManager.h"
 #include "Card.h"
-#include "Player.h"
 
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QDateTime>
 #include <iostream>
-#include <string>
-#include <locale>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-#include <windows.h>
-#endif
+// Zmienna pliku logu, która będzie dostępna w całej aplikacji
+static QFile logFile;
 
-void displayGameState(GameManager* game) {
-    Player* player = game->currentPlayer();
-    if (!player) return;
-
-    qDebug().noquote() << "\n========================================================";
-    qDebug().noquote() << QString("TURA GRACZA: %1 (%2)").arg(game->players().indexOf(player) + 1).arg(player->heroId());
-    qDebug().noquote() << QString("MOC: %1").arg(player->currentPower());
-    qDebug().noquote() << "------------------- RĘKA -------------------";
-
-    if (player->hand().isEmpty()) {
-        qDebug().noquote() << "(Pusta)";
-    } else {
-        for(int i = 0; i < player->hand().size(); ++i) {
-            qDebug().noquote() << QString("  [%1] %2").arg(i).arg(player->hand()[i]->name("pl"));
+// Nasza niestandardowa funkcja do obsługi i przekierowywania logów
+void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    // Jeśli plik nie jest otwarty, otwórz go (stanie się to przy pierwszej wiadomości)
+    if (!logFile.isOpen()) {
+        QString logDirPath = QCoreApplication::applicationDirPath() + "/logs";
+        QDir logDir(logDirPath);
+        if (!logDir.exists()) {
+            logDir.mkpath("."); // Utwórz katalog /logs jeśli nie istnieje
+        }
+        logFile.setFileName(logDirPath + "/session.log");
+        // Otwórz plik w trybie zapisu, usuwając poprzednią zawartość (Truncate)
+        if (!logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+            // Jeśli nie uda się otworzyć pliku, wypisz błąd na standardowe wyjście błędów
+            std::cerr << "Fatal: Could not open log file: " << logFile.fileName().toStdString() << std::endl;
+            return;
         }
     }
 
-    qDebug().noquote() << "------------------ LINE-UP -----------------";
-    for(int i = 0; i < game->lineUp().size(); ++i) {
-        if(game->lineUp()[i]) {
-            qDebug().noquote() << QString("  [%1] %2 (Koszt: %3)").arg(i).arg(game->lineUp()[i]->name("pl")).arg(game->lineUp()[i]->cost());
-        }
+    // Przygotowanie sformatowanej wiadomości
+    QString logMessage;
+    QTextStream out(&logMessage);
+    out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
+
+    switch (type) {
+    case QtDebugMsg:
+        out << " [DEBUG] ";
+        break;
+    case QtInfoMsg:
+        out << " [INFO] ";
+        break;
+    case QtWarningMsg:
+        out << " [WARNING] ";
+        break;
+    case QtCriticalMsg:
+        out << " [CRITICAL] ";
+        break;
+    case QtFatalMsg:
+        out << " [FATAL] ";
+        break;
     }
-    qDebug().noquote() << "------------------ AKCJE -------------------";
-    qDebug().noquote() << "Dostępne komendy: play [nr], buy [nr], kick, sv, end, quit";
-    qDebug().noquote() << "========================================================";
+
+    out << msg;
+    if (context.file) {
+        out << " (" << context.file << ":" << context.line << ", " << context.function << ")";
+    }
+
+    // Zapisz sformatowaną wiadomość do pliku
+    QTextStream logStream(&logFile);
+    logStream << logMessage << Qt::endl;
+
+    // Opcjonalnie: Przekaż wiadomość również do oryginalnej konsoli (przydatne podczas debugowania)
+    std::cout << logMessage.toStdString() << std::endl;
+
+    // W przypadku błędu krytycznego (Fatal), przerwij aplikację
+    if (type == QtFatalMsg) {
+        abort();
+    }
 }
+
 
 int main(int argc, char *argv[])
 {
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    setlocale(LC_ALL, ".UTF-8");
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
-#endif
+    QGuiApplication app(argc, argv);
 
-    QCoreApplication app(argc, argv);
-    qRegisterMetaType<Card::CardType>("Card::CardType");
+    // Instalujemy naszą funkcję obsługi wiadomości na samym początku
+    qInstallMessageHandler(messageHandler);
 
-    qDebug() << "====== WITAJ W DECK BUILDER PRO (wersja konsolowa) ======";
+    qInfo() << "Application starting...";
 
-    GameManager game;
-    game.setupNewGame(2);
+    QQmlApplicationEngine engine;
 
-    while(true) {
-        displayGameState(&game);
+    GameManager gameManager;
 
-        std::cout << "\nTwoja komenda: " << std::flush;
-        std::string std_line;
-        if (!std::getline(std::cin, std_line)) {
-            break;
-        }
-        QString line = QString::fromStdString(std_line);
+    engine.rootContext()->setContextProperty("gameManager", &gameManager);
+    qmlRegisterType<Card>("com.deckbuilderpro.game", 1, 0, "Card");
 
-        QStringList parts = line.split(" ", Qt::SkipEmptyParts);
-        if (parts.isEmpty()) continue;
+    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                     &app, [url](QObject *obj, const QUrl &objUrl) {
+                         if (!obj && url == objUrl)
+                             QCoreApplication::exit(-1);
+                     }, Qt::QueuedConnection);
+    engine.load(url);
 
-        QString command = parts[0].toLower();
+    gameManager.prepareGame(2);
 
-        bool ok;
-        int index = (parts.size() > 1) ? parts[1].toInt(&ok) : -1;
-        if (parts.size() > 1 && !ok) {
-            qDebug() << "Nieprawidłowy numer. Podaj komendę i numer, np. 'play 0'.";
-            continue;
-        }
+    qInfo() << "Application started successfully.";
 
-        if (command == "quit") {
-            qDebug() << "Do zobaczenia!";
-            break;
-        } else if (command == "play" && index != -1) {
-            game.playCardForCurrentPlayer(index);
-        } else if (command == "buy" && index != -1) {
-            game.buyCardFromLineUp(index);
-        } else if (command == "kick") {
-            game.buyKick();
-        } else if (command == "sv") {
-            game.buySuperVillain();
-        } else if (command == "end") {
-            game.nextTurn();
-        } else {
-            qDebug() << "Nieznana komenda.";
-        }
-    }
-
-    qDebug() << "\n====== APLIKACJA ZAKOŃCZYŁA DZIAŁANIE ======";
-    return 0;
+    return app.exec();
 }

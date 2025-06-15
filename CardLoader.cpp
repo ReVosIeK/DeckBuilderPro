@@ -1,65 +1,112 @@
 #include "CardLoader.h"
-#include "json.hpp"
-#include <QFile>
-#include <QDebug>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
 #include <fstream>
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
 
-using json = nlohmann::json;
+bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deckCompositionPath) {
+    QFile cardsFile(QString::fromStdString(cardsPath));
+    if (!cardsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning("Couldn't open cards file: %s", cardsPath.c_str());
+        return false;
+    }
+    QByteArray cardsData = cardsFile.readAll();
+    json cardsJson = json::parse(cardsData.toStdString(), nullptr, false);
 
-CardLoader::CardLoader(QObject *parent) : QObject(parent) {}
-
-QList<Card*> CardLoader::loadCardsFromFile(const QString &filePath)
-{
-    qDebug() << "[Loader] Próba wczytania kart z" << filePath;
-    QList<Card*> cardList;
-
-    std::ifstream file(filePath.toStdString());
-    if (!file.is_open()) {
-        qWarning() << "[Loader] Nie można otworzyć pliku:" << filePath;
-        return cardList;
+    if (cardsJson.is_discarded()) {
+        qWarning("Failed to parse cards.json. It might be malformed.");
+        return false;
     }
 
-    json data;
-    try {
-        data = json::parse(file);
-    } catch (json::parse_error& e) {
-        qWarning() << "[Loader] Błąd parsowania JSON:" << e.what();
-        return cardList;
+    if (!cardsJson.is_array()) {
+        qWarning("Invalid format in cards.json: root must be an array.");
+        return false;
     }
 
-    qDebug() << "[Loader] Znaleziono" << data.size() << "kart w pliku JSON.";
+    // Wczytywanie prototypów kart
+    for (const auto& cardDef : cardsJson) {
+        if (!cardDef.is_object()) continue;
 
-    for (const auto& item : data) {
-        try {
-            Card* newCard = new Card();
-            newCard->setId(QString::fromStdString(item.value("id", "")));
-            newCard->addName("en", QString::fromStdString(item.value("name_en", "")));
-            newCard->addName("pl", QString::fromStdString(item.value("name_pl", "")));
-            newCard->setCost(item.value("cost", 0));
-            newCard->setVp(item.value("vp", 0));
-            newCard->setCardType(QString::fromStdString(item.value("type", "Unknown")));
-            newCard->addAbility("en", QString::fromStdString(item.value("ability_en", "")));
-            newCard->addAbility("pl", QString::fromStdString(item.value("ability_pl", "")));
-            newCard->setImagePath(QString::fromStdString(item.value("image_path", "")));
-            newCard->setPower(item.value("power", 0));
+        // 1. Stwórz pusty wskaźnik na kartę (prototyp)
+        auto card = std::make_shared<Card>();
 
-            QList<QString> tags;
-            if (item.contains("effect_tags") && item["effect_tags"].is_array()) {
-                for (const auto& tag_item : item["effect_tags"]) {
-                    tags.append(QString::fromStdString(tag_item.get<std::string>()));
-                }
+        // 2. Wypełnij jego publiczne pola danymi z JSON
+        card->m_id = QString::fromStdString(cardDef.value("id", ""));
+        card->m_names["pl_PL"] = QString::fromStdString(cardDef.value("name_pl", ""));
+        card->m_names["en_US"] = QString::fromStdString(cardDef.value("name_en", ""));
+        card->m_texts["pl_PL"] = QString::fromStdString(cardDef.value("ability_pl", ""));
+        card->m_texts["en_US"] = QString::fromStdString(cardDef.value("ability_en", ""));
+        card->m_type = QString::fromStdString(cardDef.value("type", ""));
+        card->m_subtype = QString::fromStdString(cardDef.value("subtype", ""));
+        card->m_cost = cardDef.value("cost", 0);
+        card->m_power = cardDef.value("power", 0);
+        card->m_isSpecial = false;
+
+        m_cardPrototypes[card->m_id.toStdString()] = card;
+    }
+    qInfo() << "Loaded" << m_cardPrototypes.size() << "card prototypes.";
+
+    // Przygotowanie talii startowej
+    auto punchProto = getCardById("punch");
+    auto vulnerabilityProto = getCardById("vulnerability");
+    if(punchProto && vulnerabilityProto) {
+        for(int i=0; i<7; ++i) m_startingDeck.push_back(punchProto);
+        for(int i=0; i<3; ++i) m_startingDeck.push_back(vulnerabilityProto);
+        qInfo() << "Generated starting deck with" << m_startingDeck.size() << "cards.";
+    } else {
+        qWarning("Could not generate starting deck, missing 'punch' or 'vulnerability' prototype.");
+    }
+
+
+    QFile deckFile(QString::fromStdString(deckCompositionPath));
+    if (!deckFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning("Couldn't open deck composition file: %s. Main deck will be empty.", deckCompositionPath.c_str());
+        return true;
+    }
+    QByteArray deckData = deckFile.readAll();
+    json deckJson = json::parse(deckData.toStdString(), nullptr, false);
+
+    if (deckJson.is_discarded() || !deckJson.is_array()) {
+        qWarning("Could not parse deck_composition.json or it's not an array. Main deck will be empty.");
+        return true;
+    }
+
+    // Tworzenie talii głównej
+    createDeck(deckJson, m_mainDeck);
+    qInfo() << "Generated main deck with" << m_mainDeck.size() << "cards.";
+
+    return true;
+}
+
+void CardLoader::createDeck(const json& composition, std::vector<std::shared_ptr<Card>>& deck) {
+    for (const auto& item : composition) {
+        if (!item.is_object()) continue;
+
+        std::string id = item.value("id", "");
+        int count = item.value("count", 0);
+        auto it = m_cardPrototypes.find(id);
+        if (it != m_cardPrototypes.end()) {
+            for (int i = 0; i < count; ++i) {
+                deck.push_back(it->second);
             }
-            newCard->setEffectTags(tags);
-
-            cardList.append(newCard);
-        } catch (json::type_error& e) {
-            qWarning() << "[Loader] Błąd typu w danych karty:" << e.what();
+        } else {
+            qWarning("Card with id '%s' from deck_composition not found in card prototypes.", id.c_str());
         }
     }
-    qDebug() << "[Loader] Pomyślnie załadowano" << cardList.size() << "kart.";
-    return cardList;
+}
+
+const std::vector<std::shared_ptr<Card>>& CardLoader::getStartingDeck() const {
+    return m_startingDeck;
+}
+
+const std::vector<std::shared_ptr<Card>>& CardLoader::getMainDeck() const {
+    return m_mainDeck;
+}
+
+std::shared_ptr<Card> CardLoader::getCardById(const std::string& id) const {
+    auto it = m_cardPrototypes.find(id);
+    if (it != m_cardPrototypes.end()) {
+        return it->second;
+    }
+    return nullptr;
 }

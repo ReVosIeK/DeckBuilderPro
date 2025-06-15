@@ -1,105 +1,106 @@
 #include "Player.h"
 #include <random>
 #include <algorithm>
-#include <chrono>
 #include <QDebug>
 
-Player::Player(const QString &heroId, QObject *parent)
-    : QObject(parent), m_heroId(heroId), m_currentPower(0)
+Player::Player(QString name, const std::vector<std::shared_ptr<Card>>& startingDeck, QObject *parent)
+    : QObject(parent), m_name(name), m_currentPower(0)
 {
-}
+    for (const auto& cardPrototype : startingDeck) {
+        // 1. Tworzymy nową, pustą instancję karty, ustawiając gracza jako rodzica
+        Card* newCard = new Card(this);
 
-QString Player::heroId() const
-{
-    return m_heroId;
-}
+        // 2. Kopiujemy wszystkie dane z prototypu do nowej instancji
+        newCard->m_id = cardPrototype->m_id;
+        newCard->m_names = cardPrototype->m_names;
+        newCard->m_type = cardPrototype->m_type;
+        newCard->m_subtype = cardPrototype->m_subtype;
+        newCard->m_cost = cardPrototype->m_cost;
+        newCard->m_power = cardPrototype->m_power;
+        newCard->m_texts = cardPrototype->m_texts;
+        newCard->m_isSpecial = cardPrototype->m_isSpecial;
 
-int Player::currentPower() const
-{
-    return m_currentPower;
-}
-
-void Player::addPower(int amount)
-{
-    m_currentPower += amount;
-}
-
-void Player::spendPower(int amount)
-{
-    if (amount > m_currentPower) {
-        qWarning() << "Próba wydania więcej mocy niż jest dostępna!";
-        m_currentPower = 0;
-    } else {
-        m_currentPower -= amount;
+        // 3. Dodajemy nową, w pełni skonfigurowaną kartę do talii gracza
+        m_deck.push_back(newCard);
     }
+    shuffleDeck();
+    drawHand();
 }
 
-void Player::gainCard(Card *card)
+QString Player::name() const { return m_name; }
+int Player::currentPower() const { return m_currentPower; }
+int Player::discardPileSize() const { return m_discardPile.size(); }
+int Player::deckSize() const { return m_deck.size(); }
+
+
+QQmlListProperty<Card> Player::hand()
 {
-    if (card) {
-        m_discardPile.append(card);
-    }
+    // POPRAWKA: Przekazujemy 'this' jako wskaźnik do danych, a nie nullptr
+    return QQmlListProperty<Card>(this, this,
+                                  [](QQmlListProperty<Card>* prop) -> qsizetype {
+                                      // Zwraca rozmiar wektora m_hand
+                                      return reinterpret_cast<Player*>(prop->data)->m_hand.size();
+                                  },
+                                  [](QQmlListProperty<Card>* prop, qsizetype index) -> Card* {
+                                      // Zwraca wskaźnik do karty na podanym indeksie
+                                      return reinterpret_cast<Player*>(prop->data)->m_hand.at(index);
+                                  }
+                                  );
 }
 
-void Player::prepareStartingDeck(Card* punchCard, Card* vulnerabilityCard)
+QQmlListProperty<Card> Player::playedCards()
 {
-    m_deck.clear();
-    m_hand.clear();
-    m_discardPile.clear();
-    m_activeLocations.clear();
-    m_playedCards.clear();
-    for (int i = 0; i < 7; ++i) { m_deck.append(punchCard); }
-    for (int i = 0; i < 3; ++i) { m_deck.append(vulnerabilityCard); }
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::shuffle(m_deck.begin(), m_deck.end(), std::default_random_engine(seed));
+    // POPRAWKA: Przekazujemy 'this' jako wskaźnik do danych, a nie nullptr
+    return QQmlListProperty<Card>(this, this,
+                                  [](QQmlListProperty<Card>* prop) -> qsizetype {
+                                      // Zwraca rozmiar wektora m_playedCards
+                                      return reinterpret_cast<Player*>(prop->data)->m_playedCards.size();
+                                  },
+                                  [](QQmlListProperty<Card>* prop, qsizetype index) -> Card* {
+                                      // Zwraca wskaźnik do karty na podanym indeksie
+                                      return reinterpret_cast<Player*>(prop->data)->m_playedCards.at(index);
+                                  }
+                                  );
 }
 
-void Player::drawCards(int count)
-{
-    for (int i = 0; i < count; ++i) {
-        if (m_deck.isEmpty()) {
-            shuffleDiscardIntoDeck();
+
+void Player::shuffleDeck() {
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(m_deck.begin(), m_deck.end(), g);
+}
+
+void Player::drawHand() {
+    for (int i = 0; i < 5; ++i) {
+        if (m_deck.empty()) {
+            if (m_discardPile.empty()) {
+                break; // No more cards to draw
+            }
+            m_deck = m_discardPile;
+            m_discardPile.clear();
+            shuffleDeck();
+            emit discardPileChanged();
         }
-        if (m_deck.isEmpty()) {
-            qWarning() << "    -> Gracz" << m_heroId << "nie ma więcej kart do dobrania.";
-            break;
-        }
-        m_hand.append(m_deck.takeFirst());
+        m_hand.push_back(m_deck.back());
+        m_deck.pop_back();
     }
+    emit handChanged();
+    emit deckChanged();
 }
 
-Card* Player::playCard(int cardIndex)
-{
-    if (cardIndex < 0 || cardIndex >= m_hand.size()) {
-        qWarning() << "Próba zagrania nieistniejącej karty o indeksie:" << cardIndex;
-        return nullptr;
-    }
-    Card* card = m_hand.takeAt(cardIndex);
-    m_playedCards.append(card);
-    return card;
-}
-
-void Player::endTurn()
-{
-    qDebug() << "  -> Gracz" << heroId() << "kończy turę z" << m_currentPower << "Mocy.";
-    m_discardPile.append(m_hand);
-    m_hand.clear();
-    m_discardPile.append(m_playedCards);
-    m_playedCards.clear();
+void Player::endTurn() {
     m_currentPower = 0;
-    drawCards(5);
-}
+    emit currentPowerChanged();
 
-const QList<Card*>& Player::hand() const
-{
-    return m_hand;
-}
+    m_discardPile.insert(m_discardPile.end(), m_hand.begin(), m_hand.end());
+    m_hand.clear();
 
-void Player::shuffleDiscardIntoDeck()
-{
-    qDebug() << "    -> Talia gracza" << m_heroId << "jest pusta. Tasowanie stosu odrzuconych...";
-    m_deck = m_discardPile;
-    m_discardPile.clear();
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::shuffle(m_deck.begin(), m_deck.end(), std::default_random_engine(seed));
+    m_discardPile.insert(m_discardPile.end(), m_playedCards.begin(), m_playedCards.end());
+    m_playedCards.clear();
+
+    emit handChanged();
+    emit playedCardsChanged();
+    emit discardPileChanged();
+
+    drawHand();
 }
