@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
     qDebug() << "====== URUCHAMIANIE APLIKACJI ======";
 
     GameManager game;
-    game.setupNewGame(2); // Tworzymy grę dla 2 graczy
+    game.setupNewGame(2);
+
+    game.startFirstTurn();
 
     qDebug() << "\n====== APLIKACJA ZAKOŃCZYŁA DZIAŁANIE ======";
 

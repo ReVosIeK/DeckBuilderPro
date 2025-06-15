@@ -12,7 +12,7 @@
 
 GameManager::GameManager(QObject *parent) : QObject(parent)
 {
-    m_currentPlayer = nullptr; // Inicjalizacja wskaźnika
+    m_currentPlayer = nullptr;
 }
 
 void GameManager::setupNewGame(int playerCount, int superVillainCount)
@@ -29,9 +29,32 @@ void GameManager::setupNewGame(int playerCount, int superVillainCount)
     qDebug() << "[GameManager] Przygotowanie gry zakończone. Gra gotowa do rozpoczęcia.";
 }
 
+void GameManager::startFirstTurn()
+{
+    if (!m_currentPlayer) {
+        qWarning() << "[GameManager] Nie można rozpocząć tury, nie wybrano pierwszego gracza!";
+        return;
+    }
+
+    qDebug() << "\n====== TURA 1: Gracz" << m_players.indexOf(m_currentPlayer) + 1 << "(" << m_currentPlayer->heroId() << ") ======";
+
+    while(!m_currentPlayer->hand().isEmpty()) {
+        m_currentPlayer->playCard(0);
+    }
+
+    m_currentPlayer->endTurn();
+
+    qDebug() << "====== KONIEC TURY 1 ======";
+
+    QStringList handContents;
+    for(Card* card : m_currentPlayer->hand()) {
+        handContents.append(card->name("pl"));
+    }
+    qDebug() << "Nowa ręka Gracza" << m_players.indexOf(m_currentPlayer) + 1 << ":" << handContents.join(", ");
+}
+
 void GameManager::loadCardData()
 {
-    // Ta metoda pozostaje bez zmian
     QList<Card*> allCards = m_cardLoader.loadCardsFromFile("cards.json");
     if (allCards.isEmpty()) {
         qWarning() << "[GameManager] BŁĄD: Nie udało się wczytać definicji kart.";
@@ -45,7 +68,6 @@ void GameManager::loadCardData()
 
 void GameManager::buildDecks(int superVillainCount)
 {
-    // Ta metoda pozostaje bez zmian
     qDebug() << "[GameManager] Rozpoczynam budowanie talii...";
     m_mainDeck.clear();
     m_kickStack.clear();
@@ -88,10 +110,9 @@ void GameManager::buildDecks(int superVillainCount)
 
 void GameManager::prepareSuperVillainStack(int count)
 {
-    // Ta metoda pozostaje bez zmian
     QList<Card*> allSuperVillains;
     for(Card* card : m_cardsById.values()) {
-        if(card->cardType() == Card::SuperVillain) {
+        if(card->is(Card::SuperVillain)) { // Używamy is() dla poprawności
             allSuperVillains.append(card);
         }
     }
@@ -112,7 +133,6 @@ void GameManager::prepareSuperVillainStack(int count)
 
 void GameManager::createPlayers(int count)
 {
-    // Ta metoda pozostaje bez zmian
     qDebug() << "[GameManager] Tworzenie graczy...";
     qDeleteAll(m_players);
     m_players.clear();
@@ -126,10 +146,11 @@ void GameManager::createPlayers(int count)
     }
 
     QStringList heroPool = {"the_flash", "batman", "superman", "wonder_woman", "green_lantern", "aquaman", "cyborg"};
-    std::shuffle(heroPool.begin(), heroPool.end(), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()));
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(heroPool.begin(), heroPool.end(), std::default_random_engine(seed));
 
     for (int i = 0; i < count; ++i) {
-        QString heroId = heroPool.value(i, QString("Player%1_Hero").arg(i + 1));
+        QString heroId = heroPool.value(i, QString("Player%1_Default").arg(i + 1));
         Player* newPlayer = new Player(heroId, this);
 
         newPlayer->prepareStartingDeck(punchCard, vulnerabilityCard);
@@ -140,11 +161,9 @@ void GameManager::createPlayers(int count)
 
 void GameManager::dealStartingHands()
 {
-    // Ta metoda pozostaje bez zmian
     qDebug() << "[GameManager] Rozdawanie kart startowych...";
     for (int i = 0; i < m_players.count(); ++i) {
         m_players[i]->drawCards(5);
-        qDebug() << "  - Gracz" << (i + 1) << "(" << m_players[i]->heroId() << ")" << "dobrał 5 kart.";
     }
 
     qDebug() << "\n====== WERYFIKACJA STANU GRY ======";
@@ -159,7 +178,6 @@ void GameManager::dealStartingHands()
 
 void GameManager::determineFirstPlayer()
 {
-    // Ta metoda pozostaje bez zmian
     qDebug() << "[GameManager] Wybieranie pierwszego gracza...";
 
     for(int i = 0; i < m_players.count(); ++i) {

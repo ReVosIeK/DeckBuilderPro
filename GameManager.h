@@ -15,6 +15,13 @@ public:
     explicit GameManager(QObject *parent = nullptr);
 
     void setupNewGame(int playerCount, int superVillainCount = 8);
+    void takeTurnForCurrentPlayer(); // Zastępuje startFirstTurn
+
+    // Metoda do podglądania stanu gry
+    Player* currentPlayer() const;
+
+private:
+    void resolveCardEffect(Card* card); // <-- Początek naszego Silnika Efektów!
 
 private:
     void loadCardData();
