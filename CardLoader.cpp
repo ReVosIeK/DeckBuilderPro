@@ -1,87 +1,65 @@
 #include "CardLoader.h"
-#include "Card.h"
-#include <fstream>
+#include "json.hpp"
+#include <QFile>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <fstream>
+
+using json = nlohmann::json;
 
 CardLoader::CardLoader(QObject *parent) : QObject(parent) {}
 
-QList<Card*> CardLoader::loadCardsFromFile(const QString &filePath) {
-    QList<Card*> loadedCards;
+QList<Card*> CardLoader::loadCardsFromFile(const QString &filePath)
+{
+    qDebug() << "[Loader] Próba wczytania kart z" << filePath;
+    QList<Card*> cardList;
 
     std::ifstream file(filePath.toStdString());
     if (!file.is_open()) {
-        qWarning() << "Nie można otworzyć pliku z kartami:" << filePath;
-        return loadedCards;
+        qWarning() << "[Loader] Nie można otworzyć pliku:" << filePath;
+        return cardList;
     }
 
     json data;
     try {
         data = json::parse(file);
-    } catch (const json::parse_error& e) {
-        qWarning() << "Błąd parsowania pliku JSON:" << e.what();
-        return loadedCards;
-    }
-
-    if (!data.is_array()) {
-        qWarning() << "Plik JSON nie zawiera tablicy na najwyższym poziomie.";
-        return loadedCards;
+    } catch (json::parse_error& e) {
+        qWarning() << "[Loader] Błąd parsowania JSON:" << e.what();
+        return cardList;
     }
 
     qDebug() << "[Loader] Znaleziono" << data.size() << "kart w pliku JSON.";
 
-    for (const auto& cardObject : data) {
-        Card* newCard = parseCardObject(cardObject);
-        if (newCard) {
-            newCard->setParent(this);
-            loadedCards.append(newCard);
-        }
-    }
+    for (const auto& item : data) {
+        try {
+            Card* newCard = new Card();
+            newCard->setId(QString::fromStdString(item.value("id", "")));
+            newCard->addName("en", QString::fromStdString(item.value("name_en", "")));
+            newCard->addName("pl", QString::fromStdString(item.value("name_pl", "")));
+            newCard->setCost(item.value("cost", 0));
+            newCard->setVp(item.value("vp", 0));
+            newCard->setCardType(QString::fromStdString(item.value("type", "Unknown")));
+            newCard->addAbility("en", QString::fromStdString(item.value("ability_en", "")));
+            newCard->addAbility("pl", QString::fromStdString(item.value("ability_pl", "")));
+            newCard->setImagePath(QString::fromStdString(item.value("image_path", "")));
+            newCard->setPower(item.value("power", 0));
 
-    qDebug() << "[Loader] Pomyślnie załadowano" << loadedCards.count() << "kart.";
-    return loadedCards;
-}
-
-Card* CardLoader::parseCardObject(const json &cardObject) {
-    try {
-        QVariantMap nameMap;
-        nameMap.insert("en", QString::fromStdString(cardObject.at("name_en").get<std::string>()));
-        nameMap.insert("pl", QString::fromStdString(cardObject.at("name_pl").get<std::string>()));
-
-        QVariantMap abilityMap;
-        abilityMap.insert("en", QString::fromStdString(cardObject.at("ability_en").get<std::string>()));
-        abilityMap.insert("pl", QString::fromStdString(cardObject.at("ability_pl").get<std::string>()));
-
-        QString typeString = QString::fromStdString(cardObject.at("type").get<std::string>());
-        Card::CardType type;
-
-        if (typeString == "Starter") type = Card::Starter;
-        else if (typeString == "Super Power") type = Card::Superpower;
-        else if (typeString == "Weakness") type = Card::Weakness;
-        else if (typeString == "Equipment") type = Card::Equipment;
-        else if (typeString == "Hero") type = Card::Hero;
-        else if (typeString == "Villain") type = Card::Villain;
-        else if (typeString == "Location") type = Card::Location;
-        else if (typeString == "Super-Villain") type = Card::SuperVillain;
-        else if (typeString == "Kick") type = Card::Kick;
-        else {
-            if (typeString != "Super-Hero") {
-                qWarning() << "Nieznany typ karty:" << typeString << "dla ID:" << QString::fromStdString(cardObject.at("id").get<std::string>());
+            QList<QString> tags;
+            if (item.contains("effect_tags") && item["effect_tags"].is_array()) {
+                for (const auto& tag_item : item["effect_tags"]) {
+                    tags.append(QString::fromStdString(tag_item.get<std::string>()));
+                }
             }
-            return nullptr;
-        }
+            newCard->setEffectTags(tags);
 
-        return new Card(
-            QString::fromStdString(cardObject.at("id").get<std::string>()),
-            nameMap,
-            type,
-            cardObject.at("cost").get<int>(),
-            cardObject.at("power").get<int>(),
-            cardObject.at("vp").get<int>(),
-            abilityMap,
-            QString::fromStdString(cardObject.at("image_path").get<std::string>())
-            );
-    } catch (const json::exception& e) {
-        qWarning() << "Błąd parsowania obiektu JSON:" << e.what();
-        return nullptr;
+            cardList.append(newCard);
+        } catch (json::type_error& e) {
+            qWarning() << "[Loader] Błąd typu w danych karty:" << e.what();
+        }
     }
+    qDebug() << "[Loader] Pomyślnie załadowano" << cardList.size() << "kart.";
+    return cardList;
 }

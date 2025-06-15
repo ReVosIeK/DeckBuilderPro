@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.16)
-project(DeckBuilderPro VERSION 0.1 LANGUAGES CXX)
+
+project(DeckBuilderPro VERSION 0.4 LANGUAGES CXX)
+
+# === POCZĄTEK POPRAWKI KODOWANIA ===
+# Mówimy kompilatorowi, aby traktował pliki źródłowe jako UTF-8
+# i tworzył program wykonywalny również w UTF-8.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-finput-charset=UTF-8 -fexec-charset=UTF-8)
+endif()
+# === KONIEC POPRAWKI KODOWANIA ===
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -8,7 +17,6 @@ set(CMAKE_AUTOUIC OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Prosimy już tylko o moduł Core!
 find_package(Qt6 COMPONENTS Core REQUIRED)
 
 add_executable(DeckBuilderPro
@@ -16,19 +24,14 @@ add_executable(DeckBuilderPro
     Card.cpp
     Player.cpp
     CardLoader.cpp
-    GameManager.cpp # <<< Poprawiono na wielką literę
-
+    GameManager.cpp
     Card.h
     Player.h
     CardLoader.h
-    GameManager.h # <<< Poprawiono na wielką literę
+    GameManager.h
     json.hpp
-
-    cards.json
-    deck_composition.json
 )
 
-# Linkujemy już tylko z modułem Core!
 target_link_libraries(DeckBuilderPro PRIVATE
     Qt6::Core
 )

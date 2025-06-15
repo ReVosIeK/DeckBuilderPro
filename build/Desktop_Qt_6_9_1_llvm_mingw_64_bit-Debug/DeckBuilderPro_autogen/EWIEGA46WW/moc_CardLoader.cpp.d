@@ -1,6 +1,7 @@
 C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/EWIEGA46WW/moc_CardLoader.cpp: C:/Users/mresp/Desktop/DeckBuilderPro/CardLoader.h \
   C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/moc_predefs.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QList \
+  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QMap \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QObject \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QString \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/q17memory.h \
@@ -50,6 +51,7 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qlist.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qlogging.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qmalloc.h \
+  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qmap.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qmath.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qmetacontainer.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qmetatype.h \
@@ -66,6 +68,8 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qrefcount.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qscopedpointer.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qscopeguard.h \
+  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qshareddata.h \
+  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qshareddata_impl.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qstdlibdetection.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qstring.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qstringalgorithms.h \
@@ -884,4 +888,5 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/Tools/llvm-mingw1706_64/include/sdks/_mingw_ddk.h \
   C:/Qt/Tools/llvm-mingw1706_64/lib/clang/17/include/stdarg.h \
   C:/Qt/Tools/llvm-mingw1706_64/lib/clang/17/include/vadefs.h \
+  C:/Users/mresp/Desktop/DeckBuilderPro/Card.h \
   C:/Users/mresp/Desktop/DeckBuilderPro/json.hpp

@@ -1,5 +1,6 @@
 #include "GameManager.h"
 #include "Card.h"
+#include "Player.h"
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -28,26 +29,42 @@ void GameManager::setupNewGame(int playerCount, int superVillainCount)
     refillLineUp();
 
     qDebug() << "[GameManager] Przygotowanie gry zakończone. Gra gotowa do rozpoczęcia.";
+
+    // Rozpocznij pierwszą turę
+    if(!m_players.isEmpty()) {
+        if (!m_currentPlayer) {
+            m_currentPlayer = m_players.first();
+        }
+        qDebug() << "\n========================================================";
+        qDebug() << "ROZPOCZYNA SIĘ TURA GRACZA" << m_players.indexOf(m_currentPlayer) + 1 << "(" << m_currentPlayer->heroId() << ")";
+        qDebug() << "========================================================";
+    }
 }
 
-void GameManager::playFullTurnForCurrentPlayer_Test()
+void GameManager::nextTurn()
 {
-    if (!m_currentPlayer) {
-        qWarning() << "[GameManager] Błąd krytyczny: Brak aktywnego gracza.";
-        return;
+    if (m_players.isEmpty()) return;
+
+    if (m_currentPlayer) {
+        endTurnActions();
     }
 
-    qDebug() << "\n====== TURA GRACZA" << m_players.indexOf(m_currentPlayer) + 1 << "(" << m_currentPlayer->heroId() << ") ======";
+    int currentIndex = m_players.indexOf(m_currentPlayer);
+    int nextIndex = (currentIndex + 1) % m_players.size();
+    m_currentPlayer = m_players[nextIndex];
 
-    QStringList lineUpNames;
-    for(const auto& card : m_lineUp) if(card) lineUpNames.append(card->name("pl"));
-    qDebug() << "Line-Up na początku tury:" << lineUpNames.join(", ");
+    qDebug() << "\n========================================================";
+    qDebug() << "ROZPOCZYNA SIĘ TURA GRACZA" << nextIndex + 1 << "(" << m_currentPlayer->heroId() << ")";
+    qDebug() << "========================================================";
+}
 
-    while(!m_currentPlayer->hand().isEmpty()) {
-        Card* playedCard = m_currentPlayer->playCard(0);
-        if(playedCard) {
-            resolveCardEffect(playedCard);
-        }
+void GameManager::playCardForCurrentPlayer(int cardIndex)
+{
+    if (!m_currentPlayer) return;
+
+    Card* playedCard = m_currentPlayer->playCard(cardIndex);
+    if(playedCard) {
+        resolveCardEffect(playedCard);
     }
 }
 
@@ -122,10 +139,10 @@ void GameManager::endTurnActions()
     refillLineUp();
 }
 
-Player* GameManager::currentPlayer() const
-{
-    return m_currentPlayer;
-}
+Player* GameManager::currentPlayer() const { return m_currentPlayer; }
+const QList<Card*>& GameManager::lineUp() const { return m_lineUp; }
+const QList<Player*>& GameManager::players() const { return m_players; }
+
 
 void GameManager::resolveCardEffect(Card* card)
 {
@@ -277,21 +294,19 @@ void GameManager::determineFirstPlayer()
     if (!m_players.isEmpty()) {
         int firstPlayerIndex = QRandomGenerator::global()->bounded(m_players.size());
         m_currentPlayer = m_players[firstPlayerIndex];
-        qDebug() << "  -> Losowo wybrano gracza" << firstPlayerIndex + 1 << "(" << m_currentPlayer->heroId() << ")" << "do rozpoczęcia gry.";
     }
 }
 
 void GameManager::refillLineUp()
 {
     qDebug() << "[GameManager] Uzupełnianie Line-Up...";
+
+    while(m_lineUp.size() < 5) {
+        m_lineUp.append(nullptr);
+    }
+
     for(int i = 0; i < 5; ++i) {
-        if (i >= m_lineUp.size()) {
-            // Jeśli slot nie istnieje, dodaj go
-            if(!m_mainDeck.isEmpty()) {
-                m_lineUp.append(m_mainDeck.takeFirst());
-            }
-        } else if (!m_lineUp[i]) {
-            // Jeśli slot jest pusty (nullptr), uzupełnij go
+        if (!m_lineUp[i]) {
             if(!m_mainDeck.isEmpty()) {
                 m_lineUp[i] = m_mainDeck.takeFirst();
             }

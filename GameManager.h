@@ -15,15 +15,16 @@ public:
     explicit GameManager(QObject *parent = nullptr);
 
     void setupNewGame(int playerCount, int superVillainCount = 8);
-    void playFullTurnForCurrentPlayer_Test();
+    void nextTurn();
 
+    void playCardForCurrentPlayer(int cardIndex);
     void buyCardFromLineUp(int lineUpIndex);
     void buyKick();
     void buySuperVillain();
 
-    void endTurnActions();
-
+    const QList<Player*>& players() const;
     Player* currentPlayer() const;
+    const QList<Card*>& lineUp() const;
 
 private:
     void loadCardData();
@@ -34,17 +35,15 @@ private:
     void determineFirstPlayer();
     void resolveCardEffect(Card* card);
     void refillLineUp();
+    void endTurnActions();
 
     CardLoader m_cardLoader;
-
     QMap<QString, Card*> m_cardsById;
-
     QList<Card*> m_mainDeck;
     QList<Card*> m_kickStack;
     QList<Card*> m_weaknessStack;
     QList<Card*> m_superVillainStack;
     QList<Card*> m_lineUp;
-
     QList<Player*> m_players;
     Player* m_currentPlayer;
 };

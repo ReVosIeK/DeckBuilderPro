@@ -52,7 +52,7 @@ build cmake_object_order_depends_target_DeckBuilderPro: phony || DeckBuilderPro_
 build CMakeFiles/DeckBuilderPro.dir/DeckBuilderPro_autogen/mocs_compilation.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/mocs_compilation.cpp || cmake_object_order_depends_target_DeckBuilderPro
   DEFINES = -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64
   DEP_FILE = CMakeFiles\DeckBuilderPro.dir\DeckBuilderPro_autogen\mocs_compilation.cpp.obj.d
-  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -pthread
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -finput-charset=UTF-8 -fexec-charset=UTF-8 -pthread
   INCLUDES = -IC:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/include -isystem C:/Qt/6.9.1/llvm-mingw_64/include/QtCore -isystem C:/Qt/6.9.1/llvm-mingw_64/include -isystem C:/Qt/6.9.1/llvm-mingw_64/mkspecs/win32-clang-g++
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
   OBJECT_FILE_DIR = CMakeFiles\DeckBuilderPro.dir\DeckBuilderPro_autogen
@@ -60,7 +60,7 @@ build CMakeFiles/DeckBuilderPro.dir/DeckBuilderPro_autogen/mocs_compilation.cpp.
 build CMakeFiles/DeckBuilderPro.dir/main.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/main.cpp || cmake_object_order_depends_target_DeckBuilderPro
   DEFINES = -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64
   DEP_FILE = CMakeFiles\DeckBuilderPro.dir\main.cpp.obj.d
-  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -pthread
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -finput-charset=UTF-8 -fexec-charset=UTF-8 -pthread
   INCLUDES = -IC:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/include -isystem C:/Qt/6.9.1/llvm-mingw_64/include/QtCore -isystem C:/Qt/6.9.1/llvm-mingw_64/include -isystem C:/Qt/6.9.1/llvm-mingw_64/mkspecs/win32-clang-g++
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
   OBJECT_FILE_DIR = CMakeFiles\DeckBuilderPro.dir
@@ -68,7 +68,7 @@ build CMakeFiles/DeckBuilderPro.dir/main.cpp.obj: CXX_COMPILER__DeckBuilderPro_u
 build CMakeFiles/DeckBuilderPro.dir/Card.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/Card.cpp || cmake_object_order_depends_target_DeckBuilderPro
   DEFINES = -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64
   DEP_FILE = CMakeFiles\DeckBuilderPro.dir\Card.cpp.obj.d
-  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -pthread
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -finput-charset=UTF-8 -fexec-charset=UTF-8 -pthread
   INCLUDES = -IC:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/include -isystem C:/Qt/6.9.1/llvm-mingw_64/include/QtCore -isystem C:/Qt/6.9.1/llvm-mingw_64/include -isystem C:/Qt/6.9.1/llvm-mingw_64/mkspecs/win32-clang-g++
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
   OBJECT_FILE_DIR = CMakeFiles\DeckBuilderPro.dir
@@ -76,7 +76,7 @@ build CMakeFiles/DeckBuilderPro.dir/Card.cpp.obj: CXX_COMPILER__DeckBuilderPro_u
 build CMakeFiles/DeckBuilderPro.dir/Player.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/Player.cpp || cmake_object_order_depends_target_DeckBuilderPro
   DEFINES = -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64
   DEP_FILE = CMakeFiles\DeckBuilderPro.dir\Player.cpp.obj.d
-  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -pthread
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -finput-charset=UTF-8 -fexec-charset=UTF-8 -pthread
   INCLUDES = -IC:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/include -isystem C:/Qt/6.9.1/llvm-mingw_64/include/QtCore -isystem C:/Qt/6.9.1/llvm-mingw_64/include -isystem C:/Qt/6.9.1/llvm-mingw_64/mkspecs/win32-clang-g++
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
   OBJECT_FILE_DIR = CMakeFiles\DeckBuilderPro.dir
@@ -84,7 +84,7 @@ build CMakeFiles/DeckBuilderPro.dir/Player.cpp.obj: CXX_COMPILER__DeckBuilderPro
 build CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/CardLoader.cpp || cmake_object_order_depends_target_DeckBuilderPro
   DEFINES = -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64
   DEP_FILE = CMakeFiles\DeckBuilderPro.dir\CardLoader.cpp.obj.d
-  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -pthread
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -finput-charset=UTF-8 -fexec-charset=UTF-8 -pthread
   INCLUDES = -IC:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/include -isystem C:/Qt/6.9.1/llvm-mingw_64/include/QtCore -isystem C:/Qt/6.9.1/llvm-mingw_64/include -isystem C:/Qt/6.9.1/llvm-mingw_64/mkspecs/win32-clang-g++
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
   OBJECT_FILE_DIR = CMakeFiles\DeckBuilderPro.dir
@@ -92,7 +92,7 @@ build CMakeFiles/DeckBuilderPro.dir/CardLoader.cpp.obj: CXX_COMPILER__DeckBuilde
 build CMakeFiles/DeckBuilderPro.dir/GameManager.cpp.obj: CXX_COMPILER__DeckBuilderPro_unscanned_Debug C$:/Users/mresp/Desktop/DeckBuilderPro/GameManager.cpp || cmake_object_order_depends_target_DeckBuilderPro
   DEFINES = -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -DWINVER=0x0A00 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN32_WINNT=0x0A00 -D_WIN64
   DEP_FILE = CMakeFiles\DeckBuilderPro.dir\GameManager.cpp.obj.d
-  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -pthread
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fansi-escape-codes -fcolor-diagnostics -finput-charset=UTF-8 -fexec-charset=UTF-8 -pthread
   INCLUDES = -IC:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/include -isystem C:/Qt/6.9.1/llvm-mingw_64/include/QtCore -isystem C:/Qt/6.9.1/llvm-mingw_64/include -isystem C:/Qt/6.9.1/llvm-mingw_64/mkspecs/win32-clang-g++
   OBJECT_DIR = CMakeFiles\DeckBuilderPro.dir
   OBJECT_FILE_DIR = CMakeFiles\DeckBuilderPro.dir

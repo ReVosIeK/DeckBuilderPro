@@ -4,22 +4,20 @@
 #include <QObject>
 #include <QList>
 #include <QString>
-#include "json.hpp" // Dołączamy nową bibliotekę
+#include "Card.h"
+#include "json.hpp"
 
-// Używamy aliasu dla wygody
 using json = nlohmann::json;
-
-class Card;
 
 class CardLoader : public QObject
 {
     Q_OBJECT
 public:
     explicit CardLoader(QObject *parent = nullptr);
-    QList<Card*> loadCardsFromFile(const QString& filePath);
 
-private:
-    Card* parseCardObject(const json& cardObject);
+    QList<Card*> loadCardsFromFile(const QString& filePath);
 };
 
 #endif // CARDLOADER_H
+
+

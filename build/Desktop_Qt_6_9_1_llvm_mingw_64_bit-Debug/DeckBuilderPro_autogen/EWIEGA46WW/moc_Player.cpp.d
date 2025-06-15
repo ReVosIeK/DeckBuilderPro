@@ -4,14 +4,10 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QMap \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QObject \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QString \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QVariant \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QVariantMap \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/q17memory.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/q20functional.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/q20memory.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/q20type_traits.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/q20utility.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/q23utility.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qalgorithms.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qanystringview.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qarraydata.h \
@@ -36,10 +32,8 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qcontainerfwd.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qcontainerinfo.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qcontainertools_impl.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qcontiguouscache.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qdarwinhelpers.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qdatastream.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qdebug.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qexceptionhandling.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qflags.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qfloat16.h \
@@ -49,7 +43,6 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qgenericatomic.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qglobal.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qglobalstatic.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qhash.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qhashfunctions.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qiodevicebase.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qiterable.h \
@@ -75,11 +68,8 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qrefcount.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qscopedpointer.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qscopeguard.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qset.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qshareddata.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qshareddata_impl.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qsharedpointer.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qsharedpointer_impl.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qstdlibdetection.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qstring.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qstringalgorithms.h \
@@ -105,7 +95,6 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtdeprecationdefinitions.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtdeprecationmarkers.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtenvironmentvariables.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtextstream.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtformat_impl.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtmetamacros.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtnoop.h \
@@ -118,9 +107,6 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtypeinfo.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qtypes.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qutf8stringview.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qvariant.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qvariantmap.h \
-  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qvarlengtharray.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qversiontagging.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qxptype_traits.h \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/qyieldcpu.h \
@@ -851,7 +837,6 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/numeric \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/optional \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/ratio \
-  C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/set \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/stdbool.h \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/stddef.h \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/stdexcept \
@@ -867,7 +852,6 @@ C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-D
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/type_traits \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/typeinfo \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/unordered_map \
-  C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/unordered_set \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/utility \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/variant \
   C:/Qt/Tools/llvm-mingw1706_64/include/c++/v1/vector \
