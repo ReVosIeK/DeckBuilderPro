@@ -1,5 +1,6 @@
 C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/EWIEGA46WW/moc_Player.cpp: C:/Users/mresp/Desktop/DeckBuilderPro/Player.h \
   C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/DeckBuilderPro_autogen/moc_predefs.h \
+  C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QList \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QMap \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QObject \
   C:/Qt/6.9.1/llvm-mingw_64/include/QtCore/QString \

@@ -3,8 +3,13 @@
 #include <QDebug>
 #include <random>
 #include <algorithm>
+#include <QList>
 
-GameManager::GameManager(QObject *parent) : QObject(parent), m_currentPlayerIndex(-1)
+GameManager::GameManager(QObject *parent)
+    : QObject(parent),
+    m_gameState(GameState::Normal),
+    m_cardsToDiscard(0),
+    m_currentPlayerIndex(-1)
 {
     if (!m_cardLoader.loadCards(":/cards.json", ":/deck_composition.json")) {
         qCritical("Failed to load card data.");
@@ -12,6 +17,9 @@ GameManager::GameManager(QObject *parent) : QObject(parent), m_currentPlayerInde
 }
 
 void GameManager::prepareGame(int numberOfPlayers) {
+    m_gameState = GameState::Normal;
+    emit gameStateChanged();
+
     qDeleteAll(m_players);
     m_players.clear();
 
@@ -40,6 +48,8 @@ void GameManager::prepareGame(int numberOfPlayers) {
             newCard->m_power = kickPrototype->m_power;
             newCard->m_texts = kickPrototype->m_texts;
             newCard->m_isSpecial = kickPrototype->m_isSpecial;
+            newCard->m_effectTags = kickPrototype->m_effectTags;
+            newCard->m_imagePath = kickPrototype->m_imagePath;
             m_kickStack.push_back(newCard);
         }
     }
@@ -48,7 +58,6 @@ void GameManager::prepareGame(int numberOfPlayers) {
     qDeleteAll(m_superVillainStack);
     m_superVillainStack.clear();
     std::vector<std::shared_ptr<Card>> svPrototypes = m_cardLoader.getSuperVillains();
-    std::shuffle(svPrototypes.begin(), svPrototypes.end(), g);
     std::shared_ptr<Card> rasAlGhulPrototype = nullptr;
     auto it = std::remove_if(svPrototypes.begin(), svPrototypes.end(), [&](const std::shared_ptr<Card>& card){
         if (card->m_id == "ras_al_ghul") {
@@ -58,6 +67,7 @@ void GameManager::prepareGame(int numberOfPlayers) {
         return false;
     });
     svPrototypes.erase(it, svPrototypes.end());
+    std::shuffle(svPrototypes.begin(), svPrototypes.end(), g);
     const int standardGameSvCount = 7;
     if (svPrototypes.size() > standardGameSvCount) {
         svPrototypes.resize(standardGameSvCount);
@@ -72,6 +82,8 @@ void GameManager::prepareGame(int numberOfPlayers) {
         newCard->m_power = svPrototype->m_power;
         newCard->m_texts = svPrototype->m_texts;
         newCard->m_isSpecial = svPrototype->m_isSpecial;
+        newCard->m_effectTags = svPrototype->m_effectTags;
+        newCard->m_imagePath = svPrototype->m_imagePath;
         m_superVillainStack.push_back(newCard);
     }
     if (rasAlGhulPrototype) {
@@ -84,29 +96,11 @@ void GameManager::prepareGame(int numberOfPlayers) {
         newCard->m_power = rasAlGhulPrototype->m_power;
         newCard->m_texts = rasAlGhulPrototype->m_texts;
         newCard->m_isSpecial = rasAlGhulPrototype->m_isSpecial;
+        newCard->m_effectTags = rasAlGhulPrototype->m_effectTags;
+        newCard->m_imagePath = rasAlGhulPrototype->m_imagePath;
         m_superVillainStack.push_back(newCard);
     }
     emit superVillainStackChanged();
-
-    // Inicjalizacja stosu Słabości
-    qDeleteAll(m_weaknessStack);
-    m_weaknessStack.clear();
-    std::shared_ptr<Card> weaknessPrototype = m_cardLoader.getCardById("weakness");
-    if (weaknessPrototype) {
-        for (int i = 0; i < 20; ++i) {
-            Card* newCard = new Card(this);
-            newCard->m_id = weaknessPrototype->m_id;
-            newCard->m_names = weaknessPrototype->m_names;
-            newCard->m_type = weaknessPrototype->m_type;
-            newCard->m_subtype = weaknessPrototype->m_subtype;
-            newCard->m_cost = weaknessPrototype->m_cost;
-            newCard->m_power = weaknessPrototype->m_power;
-            newCard->m_texts = weaknessPrototype->m_texts;
-            newCard->m_isSpecial = weaknessPrototype->m_isSpecial;
-            m_weaknessStack.push_back(newCard);
-        }
-    }
-    emit weaknessStackChanged();
 
     qDeleteAll(m_lineUp);
     m_lineUp.clear();
@@ -117,7 +111,40 @@ void GameManager::prepareGame(int numberOfPlayers) {
     emit gameReady();
 }
 
+void GameManager::requestDiscard(int count)
+{
+    if (m_gameState == GameState::Normal) {
+        m_cardsToDiscard = count;
+        m_gameState = GameState::PlayerChoosingToDiscard;
+        emit gameStateChanged();
+        qInfo() << "Game state changed to PlayerChoosingToDiscard. Player must discard" << count << "cards.";
+    }
+}
+
+void GameManager::resolveDiscard(const QList<int>& cardIndices)
+{
+    if (m_gameState != GameState::PlayerChoosingToDiscard) return;
+
+    if (cardIndices.size() != m_cardsToDiscard) {
+        qWarning() << "Player selected" << cardIndices.size() << "cards, but should have selected" << m_cardsToDiscard;
+        return;
+    }
+
+    if (Player* p = currentPlayer()) {
+        p->discardCardsFromHand(cardIndices);
+    }
+
+    m_cardsToDiscard = 0;
+    m_gameState = GameState::Normal;
+    emit gameStateChanged();
+    qInfo() << "Player finished discarding. Game state back to Normal.";
+}
+
 void GameManager::playCardFromHand(int index) {
+    if (m_gameState != GameState::Normal) {
+        qWarning() << "Cannot play card while not in Normal game state.";
+        return;
+    }
     if (Player* p = currentPlayer()) {
         p->playCard(index);
     }
@@ -125,15 +152,16 @@ void GameManager::playCardFromHand(int index) {
 
 void GameManager::buyCardFromLineUp(int index)
 {
+    if (m_gameState != GameState::Normal) {
+        qWarning() << "Cannot buy card while not in Normal game state.";
+        return;
+    }
     Player* player = currentPlayer();
     if (!player) { return; }
     if (index < 0 || index >= m_lineUp.size() || m_lineUp.at(index) == nullptr) { return; }
 
     Card* cardToBuy = m_lineUp.at(index);
-    if (player->currentPower() < cardToBuy->cost()) {
-        qWarning() << "Not enough power to buy" << cardToBuy->getName("pl_PL");
-        return;
-    }
+    if (player->currentPower() < cardToBuy->cost()) { return; }
 
     player->spendPower(cardToBuy->cost());
     qInfo() << player->name() << "buys" << cardToBuy->getName("pl_PL");
@@ -141,26 +169,18 @@ void GameManager::buyCardFromLineUp(int index)
     cardToBuy->setParent(player);
     player->m_discardPile.push_back(cardToBuy);
     emit player->discardPileChanged();
-
     m_lineUp[index] = nullptr;
-
     emit lineUpChanged();
 }
 
 void GameManager::buyKick()
 {
+    if (m_gameState != GameState::Normal) return;
     Player* player = currentPlayer();
     if (!player) return;
-    if (m_kickStack.empty()) {
-        qWarning() << "Kick stack is empty!";
-        return;
-    }
-
+    if (m_kickStack.empty()) return;
     Card* kickToBuy = topOfKickStack();
-    if (player->currentPower() < kickToBuy->cost()) {
-        qWarning() << "Not enough power to buy Kick";
-        return;
-    }
+    if (player->currentPower() < kickToBuy->cost()) return;
 
     player->spendPower(kickToBuy->cost());
     qInfo() << player->name() << "buys a Kick";
@@ -175,32 +195,29 @@ void GameManager::buyKick()
 
 void GameManager::defeatSuperVillain()
 {
+    if (m_gameState != GameState::Normal) return;
     Player* player = currentPlayer();
     if (!player) return;
-    if (m_superVillainStack.empty()) {
-        qWarning() << "Super-Villain stack is empty!";
-        return;
-    }
+    if (m_superVillainStack.empty()) return;
 
     Card* svToDefeat = topOfSuperVillainStack();
-    if (player->currentPower() < svToDefeat->cost()) {
-        qWarning() << "Not enough power to defeat" << svToDefeat->getName("pl_PL");
-        return;
-    }
+    if (player->currentPower() < svToDefeat->cost()) return;
 
     player->spendPower(svToDefeat->cost());
     qInfo() << player->name() << "defeats" << svToDefeat->getName("pl_PL") << "!!!";
-
     m_superVillainStack.back()->setParent(player);
     player->m_discardPile.push_back(m_superVillainStack.back());
     m_superVillainStack.pop_back();
-
     emit player->discardPileChanged();
     emit superVillainStackChanged();
 }
 
 void GameManager::endTurn()
 {
+    if (m_gameState != GameState::Normal) {
+        qWarning() << "Cannot end turn while not in Normal game state.";
+        return;
+    }
     Player* player = currentPlayer();
     if (!player) return;
 
@@ -212,8 +229,7 @@ void GameManager::endTurn()
     qInfo() << "Starting turn for" << currentPlayer()->name();
 }
 
-void GameManager::refillLineUp()
-{
+void GameManager::refillLineUp() {
     bool changed = false;
     for (size_t i = 0; i < m_lineUp.size(); ++i) {
         if (m_lineUp[i] == nullptr) {
@@ -223,7 +239,7 @@ void GameManager::refillLineUp()
             }
             std::shared_ptr<Card> cardPrototype = m_mainDeck.back();
             m_mainDeck.pop_back();
-            emit mainDeckChanged(); // Sygnał o zmianie rozmiaru talii głównej
+            emit mainDeckChanged();
 
             Card* newCard = new Card(this);
             newCard->m_id = cardPrototype->m_id;
@@ -234,6 +250,8 @@ void GameManager::refillLineUp()
             newCard->m_power = cardPrototype->m_power;
             newCard->m_texts = cardPrototype->m_texts;
             newCard->m_isSpecial = cardPrototype->m_isSpecial;
+            newCard->m_effectTags = cardPrototype->m_effectTags;
+            newCard->m_imagePath = cardPrototype->m_imagePath;
 
             m_lineUp[i] = newCard;
             changed = true;
@@ -245,7 +263,7 @@ void GameManager::refillLineUp()
         for (size_t i = m_lineUp.size(); i < lineUpSize && !m_mainDeck.empty(); ++i) {
             std::shared_ptr<Card> cardPrototype = m_mainDeck.back();
             m_mainDeck.pop_back();
-            emit mainDeckChanged(); // Sygnał o zmianie rozmiaru talii głównej
+            emit mainDeckChanged();
 
             Card* newCard = new Card(this);
             newCard->m_id = cardPrototype->m_id;
@@ -256,6 +274,8 @@ void GameManager::refillLineUp()
             newCard->m_power = cardPrototype->m_power;
             newCard->m_texts = cardPrototype->m_texts;
             newCard->m_isSpecial = cardPrototype->m_isSpecial;
+            newCard->m_effectTags = cardPrototype->m_effectTags;
+            newCard->m_imagePath = cardPrototype->m_imagePath;
             m_lineUp.push_back(newCard);
         }
         changed = true;
@@ -266,16 +286,14 @@ void GameManager::refillLineUp()
     }
 }
 
-Player* GameManager::currentPlayer() const
-{
+Player* GameManager::currentPlayer() const {
     if (m_players.empty() || m_currentPlayerIndex < 0 || m_currentPlayerIndex >= m_players.size()) {
         return nullptr;
     }
     return m_players[m_currentPlayerIndex];
 }
 
-QQmlListProperty<Card> GameManager::lineUp()
-{
+QQmlListProperty<Card> GameManager::lineUp() {
     return QQmlListProperty<Card>(this, this,
                                   [](QQmlListProperty<Card>* prop) -> qsizetype {
                                       return reinterpret_cast<GameManager*>(prop->data)->m_lineUp.size();
@@ -286,38 +304,50 @@ QQmlListProperty<Card> GameManager::lineUp()
                                   );
 }
 
-Card* GameManager::topOfKickStack() const
-{
+Card* GameManager::topOfKickStack() const {
     if (m_kickStack.empty()) {
         return nullptr;
     }
     return m_kickStack.back();
 }
 
-int GameManager::kickStackSize() const
-{
+int GameManager::kickStackSize() const {
     return m_kickStack.size();
 }
 
-Card* GameManager::topOfSuperVillainStack() const
-{
+Card* GameManager::topOfSuperVillainStack() const {
     if (m_superVillainStack.empty()) {
         return nullptr;
     }
     return m_superVillainStack.back();
 }
 
-int GameManager::superVillainStackSize() const
-{
+int GameManager::superVillainStackSize() const {
     return m_superVillainStack.size();
 }
 
-int GameManager::mainDeckSize() const
-{
+int GameManager::mainDeckSize() const {
     return m_mainDeck.size();
 }
 
-int GameManager::weaknessStackSize() const
-{
+int GameManager::weaknessStackSize() const {
     return m_weaknessStack.size();
+}
+
+bool GameManager::isPlayerChoosing() const
+{
+    return m_gameState == GameState::PlayerChoosingToDiscard;
+}
+
+QString GameManager::choicePrompt() const
+{
+    if (m_gameState == GameState::PlayerChoosingToDiscard) {
+        return QString("Wybierz %1 kart(y) do odrzucenia.").arg(m_cardsToDiscard);
+    }
+    return "";
+}
+
+int GameManager::cardsToDiscard() const
+{
+    return m_cardsToDiscard;
 }

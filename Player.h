@@ -8,6 +8,8 @@
 #include <QQmlListProperty>
 #include "Card.h"
 
+class GameManager; // Deklaracja wyprzedzająca, aby uniknąć cyklicznych zależności
+
 class Player : public QObject
 {
     Q_OBJECT
@@ -19,7 +21,7 @@ class Player : public QObject
     Q_PROPERTY(int deckSize READ deckSize NOTIFY deckChanged)
 
 public:
-    explicit Player(QString name, const std::vector<std::shared_ptr<Card>>& startingDeck, QObject *parent = nullptr);
+    explicit Player(QString name, const std::vector<std::shared_ptr<Card>>& startingDeck, GameManager* gameManager);
 
     QString name() const;
     int currentPower() const;
@@ -31,9 +33,11 @@ public:
 
     void drawHand();
     void endTurn();
+    void spendPower(int amount);
+    void drawCards(int count);
+    void discardCardsFromHand(const QList<int>& indices); // Nowa metoda
 
     Q_INVOKABLE void playCard(int index);
-    void spendPower(int amount); // Deklaracja metody do wydawania mocy
 
 signals:
     void currentPowerChanged();
@@ -53,6 +57,7 @@ public:
 
 private:
     void shuffleDeck();
+    GameManager* m_gameManager; // Wskaźnik do głównego menedżera gry
 };
 
 #endif // PLAYER_H

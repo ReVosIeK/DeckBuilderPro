@@ -50,6 +50,7 @@ template <> constexpr inline auto Card::qt_create_metaobjectdata<qt_meta_tag_ZN4
         "cost",
         "power",
         "isSpecial",
+        "imagePath",
         "name",
         "text"
     };
@@ -79,10 +80,12 @@ template <> constexpr inline auto Card::qt_create_metaobjectdata<qt_meta_tag_ZN4
         QtMocHelpers::PropertyData<int>(10, QMetaType::Int, QMC::DefaultPropertyFlags | QMC::Constant),
         // property 'isSpecial'
         QtMocHelpers::PropertyData<bool>(11, QMetaType::Bool, QMC::DefaultPropertyFlags | QMC::Constant),
+        // property 'imagePath'
+        QtMocHelpers::PropertyData<QString>(12, QMetaType::QString, QMC::DefaultPropertyFlags | QMC::Constant),
         // property 'name'
-        QtMocHelpers::PropertyData<QString>(12, QMetaType::QString, QMC::DefaultPropertyFlags, 0),
-        // property 'text'
         QtMocHelpers::PropertyData<QString>(13, QMetaType::QString, QMC::DefaultPropertyFlags, 0),
+        // property 'text'
+        QtMocHelpers::PropertyData<QString>(14, QMetaType::QString, QMC::DefaultPropertyFlags, 0),
     };
     QtMocHelpers::UintData qt_enums {
     };
@@ -125,8 +128,9 @@ void Card::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
         case 3: *reinterpret_cast<int*>(_v) = _t->cost(); break;
         case 4: *reinterpret_cast<int*>(_v) = _t->power(); break;
         case 5: *reinterpret_cast<bool*>(_v) = _t->isSpecial(); break;
-        case 6: *reinterpret_cast<QString*>(_v) = _t->name(); break;
-        case 7: *reinterpret_cast<QString*>(_v) = _t->text(); break;
+        case 6: *reinterpret_cast<QString*>(_v) = _t->imagePath(); break;
+        case 7: *reinterpret_cast<QString*>(_v) = _t->name(); break;
+        case 8: *reinterpret_cast<QString*>(_v) = _t->text(); break;
         default: break;
         }
     }
@@ -164,7 +168,7 @@ int Card::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
             || _c == QMetaObject::ResetProperty || _c == QMetaObject::BindableProperty
             || _c == QMetaObject::RegisterPropertyMetaType) {
         qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 9;
     }
     return _id;
 }

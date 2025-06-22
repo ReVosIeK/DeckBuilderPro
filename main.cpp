@@ -9,6 +9,7 @@
 #include <QTextStream>
 #include <QDateTime>
 #include <iostream>
+#include <QUrl>
 
 static QFile logFile;
 
@@ -20,7 +21,6 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
         if (!logDir.exists()) {
             logDir.mkpath(".");
         }
-        // POPRAWKA: Zmiana rozszerzenia pliku na .txt
         logFile.setFileName(logDirPath + "/session.txt");
         if (!logFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
             std::cerr << "Fatal: Could not open log file: " << logFile.fileName().toStdString() << std::endl;
@@ -77,8 +77,17 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     GameManager gameManager;
-
     engine.rootContext()->setContextProperty("gameManager", &gameManager);
+
+    const QUrl appDirUrl = QUrl::fromLocalFile(QGuiApplication::applicationDirPath());
+    engine.rootContext()->setContextProperty("appDirUrl", appDirUrl);
+
+    // --- POCZĄTEK POPRAWKI ---
+    // Rejestrujemy typ GameManager, aby QML znał jego enumy.
+    // Robimy to jako "Uncreatable" (nie do tworzenia), bo mamy tylko jedną, globalną instancję.
+    qmlRegisterUncreatableType<GameManager>("com.deckbuilderpro.game", 1, 0, "GameManager", "GameManager cannot be created in QML, use 'gameManager' context property.");
+    // --- KONIEC POPRAWKI ---
+
     qmlRegisterType<Card>("com.deckbuilderpro.game", 1, 0, "Card");
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));

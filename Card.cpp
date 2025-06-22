@@ -13,6 +13,7 @@ QString Card::subtype() const { return m_subtype; }
 int Card::cost() const { return m_cost; }
 int Card::power() const { return m_power; }
 bool Card::isSpecial() const { return m_isSpecial; }
+QString Card::imagePath() const { return m_imagePath; } // Implementacja gettera
 
 QString Card::name() const
 {

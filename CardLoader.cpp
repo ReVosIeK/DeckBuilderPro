@@ -3,7 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
-#include <algorithm> // Dodajemy dla std::shuffle
+#include <algorithm>
 
 bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deckCompositionPath) {
     m_cardPrototypes.clear();
@@ -38,6 +38,15 @@ bool CardLoader::loadCards(const std::string& cardsPath, const std::string& deck
         card->m_cost = cardDef.value("cost", 0);
         card->m_power = cardDef.value("power", 0);
         card->m_isSpecial = false;
+        card->m_imagePath = QString::fromStdString(cardDef.value("image_path", "")); // Wczytanie ścieżki do obrazka
+
+        if (cardDef.contains("effect_tags") && cardDef["effect_tags"].is_array()) {
+            for (const auto& tag : cardDef["effect_tags"]) {
+                if (tag.is_string()) {
+                    card->m_effectTags.append(QString::fromStdString(tag.get<std::string>()));
+                }
+            }
+        }
 
         m_cardPrototypes[card->m_id.toStdString()] = card;
 

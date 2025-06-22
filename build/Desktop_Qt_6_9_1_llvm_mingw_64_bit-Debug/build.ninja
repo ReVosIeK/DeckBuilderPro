@@ -125,6 +125,12 @@ build DeckBuilderPro.exe: CXX_EXECUTABLE_LINKER__DeckBuilderPro_Debug CMakeFiles
 
 
 #############################################
+# Utility command for copy_assets
+
+build copy_assets: phony CMakeFiles/copy_assets DeckBuilderPro.exe
+
+
+#############################################
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
@@ -181,6 +187,14 @@ build DeckBuilderPro_autogen/EWIEGA46WW/qrc_resources.cpp | ${cmake_ninja_workdi
 
 
 #############################################
+# Custom command for CMakeFiles\copy_assets
+
+build CMakeFiles/copy_assets | ${cmake_ninja_workdir}CMakeFiles/copy_assets: CUSTOM_COMMAND || DeckBuilderPro.exe DeckBuilderPro_autogen DeckBuilderPro_autogen_timestamp_deps
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D C:\Users\mresp\Desktop\DeckBuilderPro\build\Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug && C:\Qt\Tools\CMake_64\bin\cmake.exe -E copy_directory C:/Users/mresp/Desktop/DeckBuilderPro/assets C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug/assets"
+  DESC = Copying assets to build directory
+
+
+#############################################
 # Phony custom command for CMakeFiles\DeckBuilderPro_autogen
 
 build CMakeFiles/DeckBuilderPro_autogen | ${cmake_ninja_workdir}CMakeFiles/DeckBuilderPro_autogen: phony DeckBuilderPro_autogen/timestamp || DeckBuilderPro_autogen_timestamp_deps
@@ -198,7 +212,7 @@ build DeckBuilderPro: phony DeckBuilderPro.exe
 #############################################
 # Folder: C:/Users/mresp/Desktop/DeckBuilderPro/build/Desktop_Qt_6_9_1_llvm_mingw_64_bit-Debug
 
-build all: phony DeckBuilderPro.exe
+build all: phony DeckBuilderPro.exe copy_assets
 
 # =============================================================================
 # Built-in targets

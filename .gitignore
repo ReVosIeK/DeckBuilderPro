@@ -15,3 +15,8 @@ CMakeLists.txt.user
 # Pliki systemowe
 .DS_Store
 Thumbs.db
+
+# Ignorowanie niechcianych formatów i plików roboczych w assets
+*.bat
+*.jpg
+*raw.png
